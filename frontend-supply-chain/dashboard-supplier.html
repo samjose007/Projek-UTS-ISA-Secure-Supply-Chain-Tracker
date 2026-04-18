@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Supplier - Domain Expired Track</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0d1117; color: white; font-family: 'Poppins', sans-serif; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 20px; margin-bottom: 30px; }
+        h1 span { color: #39FF14; }
+        .logout-btn { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 8px 15px; border-radius: 20px; cursor: pointer; text-decoration: none; }
+        .form-input { width: 100%; background: #161b22; border: 1px solid #333; color: white; padding: 12px; margin: 10px 0 20px; border-radius: 5px; }
+        .btn { background: #39FF14; color: black; padding: 10px 20px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .container { background: #161b22; padding: 30px; border-radius: 10px; border: 1px solid rgba(57,255,20,0.3); max-width: 600px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Portal <span>Supplier</span></h1>
+        <a href="index.html" class="logout-btn">Keluar</a>
+    </div>
+
+    <div class="container">
+        <h2 style="margin-bottom: 20px;">Input Barang Keluar (Generate Resi)</h2>
+        <label>Nama Barang / Kargo</label>
+        <input type="text" class="form-input" placeholder="Masukkan nama barang">
+        
+        <label>Tujuan Pengiriman</label>
+        <input type="text" class="form-input" placeholder="Kota Tujuan">
+        
+        <button class="btn" onclick="alert('Resi berhasil dibuat! Menunggu penjemputan Kurir.')">Buat Resi Pengiriman</button>
+    </div>
+</body>
+</html>

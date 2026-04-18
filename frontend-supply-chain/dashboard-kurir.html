@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kurir - Domain Expired Track</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #39FF14;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 span {
+            color: #39FF14;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+        }
+
+        .card {
+            background: #161b22;
+            padding: 30px;
+            border-radius: 15px;
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+            border: 1px solid #333;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #39FF14;
+            color: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .btn-update {
+            background: #39FF14;
+            color: black;
+            padding: 15px;
+            width: 100%;
+            border: none;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Sistem <span>Kurir</span></h1>
+        <a href="index.html" class="logout-btn">Keluar</a>
+    </div>
+
+    <div class="card">
+        <h2>Update Status Resi</h2>
+        <p style="color: #8b949e; font-size: 14px;">Scan barcode atau ketik manual</p>
+
+        <input type="text" class="form-input" placeholder="TRX-XXXXX">
+
+        <select class="form-input" style="text-align: left;">
+            <option>Barang dijemput dari Supplier</option>
+            <option>Tiba di Hub Transit</option>
+            <option>Dalam Perjalanan ke Tujuan</option>
+            <option>Paket Berhasil Dikirim</option>
+        </select>
+
+        <button class="btn-update" onclick="alert('Status pengiriman berhasil diupdate ke server!')">Update
+            Status</button>
+    </div>
+</body>
+
+<script>
+    async function updateStatusKeServer() {
+        const resi = document.querySelector('.form-input[placeholder="TRX-XXXXX"]').value;
+        const status = document.querySelector('select.form-input').value;
+        const token = localStorage.getItem('token_akses'); // Ambil token dari login
+
+        if (!token) {
+            alert("Anda belum login!");
+            window.location.href = "index.html";
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/pelacakan/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // MASUKKAN TOKEN KE HEADER
+                },
+                body: JSON.stringify({
+                    id_pengiriman: 1, // Harusnya dinamis sesuai resi
+                    id_pengguna: 1,   // Harusnya dari token
+                    aksi_pelacakan: status,
+                    lokasi_pelacakan: "Gudang Surabaya"
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Berhasil! Hash Terbentuk: " + data.hash_terbentuk);
+            } else {
+                alert("Ditolak: " + data.detail); // Muncul jika role bukan Kurir
+            }
+        } catch (err) {
+            alert("Koneksi gagal!");
+        }
+    }
+</script>
+
+</html>

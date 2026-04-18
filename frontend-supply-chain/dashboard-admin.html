@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Domain Expired Track</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0d1117; color: white; font-family: 'Poppins', sans-serif; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 20px; margin-bottom: 30px; }
+        h1 span { color: #39FF14; }
+        .logout-btn { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 8px 15px; border-radius: 20px; cursor: pointer; text-decoration: none; }
+        .logout-btn:hover { background: #ff4444; color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: #161b22; padding: 20px; border-radius: 10px; border-left: 4px solid #39FF14; }
+        table { width: 100%; margin-top: 30px; border-collapse: collapse; background: #161b22; border-radius: 10px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #39FF14; color: #0d1117; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dashboard <span>Admin Utama</span></h1>
+        <a href="index.html" class="logout-btn">Keluar</a>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>Total Pengiriman Aktif</h3>
+            <h2 style="color: #39FF14; font-size: 2rem;">1,284</h2>
+        </div>
+        <div class="card">
+            <h3>Total Supplier Terdaftar</h3>
+            <h2 style="color: #39FF14; font-size: 2rem;">56</h2>
+        </div>
+        <div class="card">
+            <h3>Total Kurir Bertugas</h3>
+            <h2 style="color: #39FF14; font-size: 2rem;">312</h2>
+        </div>
+    </div>
+
+    <table>
+        <tr><th>No Resi</th><th>Supplier</th><th>Status Terbaru</th><th>Aksi</th></tr>
+        <tr><td>TRX001</td><td>PT Indo Jaya</td><td>Dalam Perjalanan</td><td><button style="background: #39FF14; border:none; padding: 5px 10px; border-radius: 5px;">Detail</button></td></tr>
+        <tr><td>TRX002</td><td>CV Maju Terus</td><td>Selesai</td><td><button style="background: #39FF14; border:none; padding: 5px 10px; border-radius: 5px;">Detail</button></td></tr>
+    </table>
+</body>
+</html>

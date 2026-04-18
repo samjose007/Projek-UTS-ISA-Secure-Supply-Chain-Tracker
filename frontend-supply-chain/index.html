@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Expired Track - Supply Chain Tracking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --surface-color: #161b22;
+            --neon-green: #39FF14;
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Navbar Styling */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background-color: var(--surface-color);
+            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-green);
+            background-color: rgba(57, 255, 20, 0.1);
+        }
+
+        /* Tombol Profile Baru */
+        .profile-btn {
+            background: none;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-btn:hover {
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+            background-color: rgba(57, 255, 20, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* CSS Tambahan untuk Social Login */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: .5em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: .5em;
+        }
+
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: #ffffff;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-google:hover {
+            background: #e6e6e6;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        /* Hero & Tracking */
+        .hero {
+            min-height: 75vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            background: radial-gradient(circle at center, rgba(57, 255, 20, 0.05) 0%, var(--bg-color) 70%);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            color: var(--neon-green);
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        .track-container {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+            background: var(--surface-color);
+            border-radius: 30px;
+            padding: 5px;
+            border: 2px solid rgba(57, 255, 20, 0.3);
+            transition: 0.3s;
+        }
+
+        .track-container:focus-within {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+        }
+
+        .track-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 15px 25px;
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn-neon {
+            background-color: var(--neon-green);
+            color: var(--bg-color);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-neon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-green);
+            background-color: #2eeb10;
+        }
+
+        #trackingResult {
+            margin-top: 40px;
+            width: 100%;
+            max-width: 600px;
+            background: var(--surface-color);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid var(--neon-green);
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal Auth (Login/Register) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            margin: 5vh auto;
+            padding: 30px;
+            border: 1px solid var(--neon-green);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.15);
+            position: relative;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: var(--text-muted);
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--neon-green);
+        }
+
+        .tab-header {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--neon-green);
+            border-bottom-color: var(--neon-green);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            background: var(--bg-color);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.1);
+        }
+
+        .form-select option {
+            background: var(--surface-color);
+            color: white;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--surface-color);
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .track-container {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+
+            .btn-neon {
+                border-radius: 10px;
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="#" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--neon-green)" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                </path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            Domain Expired<span>Track</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#">Beranda</a></li>
+            <li><a href="#">Cek Tarif</a></li>
+
+            <li>
+                <button class="profile-btn" onclick="bukaModalAuth()" title="Login / Daftar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
+            </li>
+
+        </ul>
+    </nav>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="tutupModalAuth()">&times;</span>
+
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('daftar')">Daftar</button>
+            </div>
+
+            <form id="formLogin" class="auth-form active" onsubmit="prosesLogin(event)">
+                <div class="form-group">
+                    <label>Nama / Username / Email</label>
+                    <input type="text" id="loginId" class="form-input" placeholder="Masukkan Username/Email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPass" class="form-input" placeholder="Masukkan Password" required>
+                </div>
+                <div class="divider">Or login with:</div>
+                <button type="button" class="btn-google" onclick="loginGoogle()">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google Logo"
+                        width="18">
+                    Google
+                </button>
+                <button type="submit" id="btnSubmitLogin" class="btn-neon"
+                    style="width: 100%; border-radius: 10px; margin-top: 10px;">Masuk Sekarang</button>
+            </form>
+
+            <form id="formDaftar" class="auth-form" onsubmit="prosesDaftar(event)">
+                <div class="form-group">
+                    <label>Nama Lengkap / Username</label>
+                    <input type="text" class="form-input" placeholder="Nama lengkap atau username" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-input" placeholder="contoh@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password Baru</label>
+                    <input type="password" class="form-input" placeholder="Buat password yang kuat" required>
+                </div>
+                <div class="form-group">
+                    <label>Daftar Sebagai (Role)</label>
+                    <select class="form-select" required>
+                        <option value="Supplier">Supplier</option>
+                        <option value="Kurir">Kurir</option>
+                    </select>
+                </div>
+                <div class="divider">Or register with:</div>
+                <button type="button" class="btn-google" onclick="loginGoogle()">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google Logo"
+                        width="18">
+                    Google
+                </button>
+                <button type="submit" id="btnSubmitDaftar" class="btn-neon"
+                    style="width: 100%; border-radius: 10px; margin-top: 10px;">Buat Akun</button>
+            </form>
+        </div>
+    </div>
+
+    <section class="hero">
+        <h1>Lacak Pengiriman <span>Supply Chain</span> Anda</h1>
+        <p>Pantau pergerakan barang dari supplier, kurir, hingga sampai ke tangan Anda secara real-time.</p>
+        <div class="track-container">
+            <input type="text" id="resiInput" class="track-input"
+                placeholder="Masukkan Nomor Resi Anda (Contoh: TRX123456)">
+            <button class="btn-neon" onclick="lacakPaket()">Lacak Paket</button>
+        </div>
+        <div id="trackingResult">
+            <h3 style="color: var(--neon-green); margin-bottom: 10px;">Status: Sedang Dikirim</h3>
+            <p><strong>Resi:</strong> <span id="displayResi"></span></p>
+            <p><strong>Posisi:</strong> Fasilitas Sortir Jakarta</p>
+            <br>
+            <small style="color: var(--text-muted);">Diperbarui oleh Kurir: 15 menit yang lalu</small>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Domain Expired Track Logistics. Sistem Pelacakan Terpadu.</p>
+    </footer>
+
+    <script>
+        // Logic Tracking
+        function lacakPaket() {
+            const input = document.getElementById('resiInput').value;
+            const btn = document.querySelector('.hero .btn-neon');
+
+            if (!input) return alert('Masukkan nomor resi!');
+
+            btn.innerText = "Mencari...";
+            setTimeout(() => {
+                document.getElementById('displayResi').innerText = input.toUpperCase();
+                document.getElementById('trackingResult').style.display = 'block';
+                btn.innerText = "Lacak Paket";
+            }, 800);
+        }
+
+        // Memungkinkan user menekan "Enter"
+        document.getElementById('resiInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') lacakPaket();
+        });
+
+        // Logic Modal & Tabs
+        const modal = document.getElementById("authModal");
+        function bukaModalAuth() { modal.style.display = "block"; }
+        function tutupModalAuth() { modal.style.display = "none"; }
+        window.onclick = function (event) { if (event.target == modal) tutupModalAuth(); }
+
+        function switchTab(tabId) {
+            // Hapus status aktif dari semua tombol dan form
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+
+            // Tambahkan status aktif ke tab yang diklik
+            if (tabId === 'login') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('formLogin').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('formDaftar').classList.add('active');
+            }
+        }
+
+        // Logic Login Redirection
+        async function prosesLogin(event) {
+            event.preventDefault();
+
+            const identifier = document.getElementById('loginId').value;
+            const password = document.getElementById('loginPass').value;
+            const role = document.getElementById('loginRole').value;
+            const btn = document.getElementById('btnSubmitLogin');
+
+            btn.innerText = "Memverifikasi...";
+
+            try {
+                // Simulasi hit API Verify 2FA (Anggap user sudah input OTP di modal)
+                // Di sistem asli, kamu perlu modal tambahan untuk input OTP
+                const otpInput = prompt("Masukkan 6 digit kode dari Google Authenticator:");
+
+                const response = await fetch(`http://127.0.0.1:8000/auth/2fa/verify?secret=KODE_SECRET_USER&kode_otp=${otpInput}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // SIMPAN TOKEN KE BROWSER
+                    localStorage.setItem('token_akses', result.access_token);
+                    localStorage.setItem('user_role', result.role);
+
+                    alert("Login Berhasil! Mengarahkan ke Dashboard...");
+                    window.location.href = `dashboard-${result.role.toLowerCase()}.html`;
+                } else {
+                    alert("Gagal: " + result.detail);
+                    btn.innerText = "Masuk Sekarang";
+                }
+            } catch (err) {
+                alert("Server tidak merespon. Pastikan Uvicorn jalan!");
+                btn.innerText = "Masuk Sekarang";
+            }
+        }
+        
+        function loginGoogle() {
+        try {
+        // 1. Cek tab mana yang lagi aktif (Login atau Daftar)
+        const formDaftar = document.getElementById('formDaftar');
+        const isModeDaftar = formDaftar && formDaftar.classList.contains('active');
+        
+        let rolePilihan, mode;
+
+        if (isModeDaftar) {
+            mode = 'register';
+            // Cari dropdown di dalam form daftar (pakai querySelector biar lebih akurat)
+            const selectDaftar = document.querySelector('#formDaftar select');
+            rolePilihan = selectDaftar ? selectDaftar.value : 'Supplier';
+        } else {
+            mode = 'login';
+            // Cari dropdown di dalam form login
+            const selectLogin = document.getElementById('loginRole');
+            rolePilihan = selectLogin ? selectLogin.value : 'Supplier';
+        }
+
+        // 2. Validasi Terakhir: Kalau rolePilihan masih kosong, paksa ke Supplier
+        if (!rolePilihan) rolePilihan = 'Supplier';
+
+        console.log(`🚀 Meluncur ke Google SSO! Mode: ${mode}, Role: ${rolePilihan}`);
+
+        // 3. Eksekusi Pindah ke Backend
+        window.location.href = `http://127.0.0.1:8000/auth/login?role=${rolePilihan}&mode=${mode}`;
+        
+        } catch (err) {
+            console.error("Waduh, ada error di JS:", err);
+            alert("Gagal memproses login Google. Cek konsol F12!");
+        }
+    }
+        // Logic Daftar
+        function prosesDaftar(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnSubmitDaftar');
+            btn.innerText = "Membuat Akun...";
+            setTimeout(() => {
+                alert("Akun berhasil dibuat! Silakan masuk menggunakan akun baru Anda.");
+                document.getElementById('formDaftar').reset();
+                switchTab('login'); // Pindahkan user kembali ke tab login otomatis
+                btn.innerText = "Buat Akun";
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
