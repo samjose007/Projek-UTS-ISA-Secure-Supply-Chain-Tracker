@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selesaikan Pendaftaran - Domain Expired Track</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0d1117; color: white; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .modal-content { background-color: #161b22; padding: 30px; border: 1px solid #39FF14; border-radius: 20px; width: 90%; max-width: 450px; box-shadow: 0 0 30px rgba(57, 255, 20, 0.15); text-align: center; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 13px; color: #8b949e; }
+        .form-select { width: 100%; background: #0d1117; border: 1px solid rgba(57, 255, 20, 0.3); border-radius: 10px; padding: 12px 15px; color: white; outline: none; }
+        .form-select:focus { border-color: #39FF14; }
+        .btn-neon { background-color: #39FF14; color: #0d1117; border: none; padding: 15px 30px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-neon:hover { box-shadow: 0 0 20px #39FF14; }
+    </style>
+</head>
+<body>
+    <div class="modal-content">
+        <h2 style="margin-bottom: 5px;">Lengkapi Profil Anda</h2>
+        <p style="color: #8b949e; font-size: 14px; margin-bottom: 25px;">Pilih peran dan jasa pengiriman Anda.</p>
+        
+        <div class="form-group">
+            <label>Peran Anda di Sistem:</label>
+            <select id="roleSelect" class="form-select" onchange="toggleJasaSelect()">
+                <option value="Supplier">Supplier (Pengirim Barang)</option>
+                <option value="Kurir">Kurir (Pengantar Barang)</option>
+                <option value="Admin">Admin (Verifikator)</option>
+            </select>
+        </div>
+
+        <div id="jasaGroup" class="form-group" style="display: none;">
+            <label>Perusahaan Jasa Logistik:</label>
+            <select id="jasaSelect" class="form-select">
+                <option value="FastSend Express">FastSend Express</option>
+                <option value="PastiSampai Logistik">PastiSampai Logistik</option>
+            </select>
+        </div>
+
+        <button class="btn-neon" id="btnSubmit" onclick="selesaikanDaftar()">Simpan & Masuk Dashboard</button>
+    </div>
+
+    <script>
+        function toggleJasaSelect() {
+            const role = document.getElementById('roleSelect').value;
+            // Hanya Kurir dan Admin yang butuh milih jasa logistik
+            document.getElementById('jasaGroup').style.display = (role === 'Kurir' || role === 'Admin') ? 'block' : 'none';
+        }
+
+        async function selesaikanDaftar() {
+            const role = document.getElementById('roleSelect').value;
+            const jasa = role !== 'Supplier' ? document.getElementById('jasaSelect').value : null;
+            document.getElementById('btnSubmit').innerText = "Menyimpan...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/complete-registration', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ role: role, jasa_logistik: jasa })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert("Berhasil didaftarkan! Silakan login untuk melanjutkan.");
+                    window.location.href = "index.html"; // Kembalikan ke depan untuk login
+                } else {
+                    alert("Gagal: " + data.detail);
+                    document.getElementById('btnSubmit').innerText = "Simpan & Masuk Dashboard";
+                }
+            } catch (err) {
+                alert("Gagal menghubungi server.");
+                document.getElementById('btnSubmit').innerText = "Simpan & Masuk Dashboard";
+            }
+        }
+    </script>
+</body>
+</html>

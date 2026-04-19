@@ -13,6 +13,8 @@ class Pengguna(Base):
     role = Column(String(30), nullable=False) # 'Admin', 'Supplier', 'Kurir'
     waktu_dibuat = Column(DateTime, default=datetime.datetime.utcnow)
     email = Column(String(45))
+    jasa_logistik = Column(String(100), nullable=True)
+    totp_secret = Column(String(50), nullable=True) # Kunci rahasia 2FA
 
     # Relasi
     produk = relationship("Produk", back_populates="supplier")
@@ -43,9 +45,11 @@ class Pengiriman(Base):
     id_kurir = Column(Integer, ForeignKey("pengguna.id_pengguna"))
     waktu_diperbarui = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     nomor_resi = Column(String(50), unique=True, index=True)
+    nama_penerima = Column(String(100))
+    alamat_penerima = Column(String(500)) # Butuh string panjang karena akan dienkripsi AES
+    ekspedisi_pilihan = Column(String(100))
 
     produk = relationship("Produk", back_populates="pengiriman")
-    # back_populates disamakan menjadi "pengiriman" (sebelumnya "pengiriman_kurir")
     kurir = relationship("Pengguna", back_populates="pengiriman") 
     log_pelacakan = relationship("LogPelacakan", back_populates="pengiriman")
 

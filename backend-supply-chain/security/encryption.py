@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 """ Generate dummy aja ini """
-SECRET_KEY = os.getenv("SECRET_KEY", Fernet.generate_key().decode()).encode()
+SECRET_KEY = os.getenv("ENCRYPTION_KEY", Fernet.generate_key().decode()).encode()
 
 cipher_suite = Fernet(SECRET_KEY)
 

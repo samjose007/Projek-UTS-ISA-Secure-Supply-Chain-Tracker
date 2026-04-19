@@ -1,35 +1,319 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Supplier - Domain Expired Track</title>
+    <title>Portal Supplier - Secure Tracking</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0d1117; color: white; font-family: 'Poppins', sans-serif; margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 20px; margin-bottom: 30px; }
-        h1 span { color: #39FF14; }
-        .logout-btn { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 8px 15px; border-radius: 20px; cursor: pointer; text-decoration: none; }
-        .form-input { width: 100%; background: #161b22; border: 1px solid #333; color: white; padding: 12px; margin: 10px 0 20px; border-radius: 5px; }
-        .btn { background: #39FF14; color: black; padding: 10px 20px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
-        .container { background: #161b22; padding: 30px; border-radius: 10px; border: 1px solid rgba(57,255,20,0.3); max-width: 600px; margin: 0 auto; }
+        body {
+            background-color: #0d1117;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #39FF14;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #161b22;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            margin: 10px 0 20px;
+            border-radius: 5px;
+        }
+
+        .btn {
+            background: #39FF14;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .main-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 75vh;
+        }
+
+        .container {
+            background: #161b22;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            width: 100%;
+            max-width: 550px;
+            /* Lebar form dibatasi agar rapi di tengah */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <h1>Portal <span>Supplier</span></h1>
-        <a href="index.html" class="logout-btn">Keluar</a>
+    <div class="header"
+        style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 15px; margin-bottom: 30px;">
+        <h1 style="margin: 0; font-size: 24px;">Portal <span style="color: #39FF14;" id="roleTitle">...</span></h1>
+
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="text-align: right; line-height: 1.2;">
+                <div id="displayUsername" style="font-weight: bold; font-size: 16px;">Loading...</div>
+                <div id="displayEkspedisi" style="font-size: 12px; color: #8b949e;">Loading...</div>
+            </div>
+
+            <button onclick="bukaSettingModal()"
+                style="background: transparent; border: none; color: #39FF14; cursor: pointer;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
+            </button>
+        </div>
     </div>
 
-    <div class="container">
-        <h2 style="margin-bottom: 20px;">Input Barang Keluar (Generate Resi)</h2>
-        <label>Nama Barang / Kargo</label>
-        <input type="text" class="form-input" placeholder="Masukkan nama barang">
-        
-        <label>Tujuan Pengiriman</label>
-        <input type="text" class="form-input" placeholder="Kota Tujuan">
-        
-        <button class="btn" onclick="alert('Resi berhasil dibuat! Menunggu penjemputan Kurir.')">Buat Resi Pengiriman</button>
+    <div id="modalSetting"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.8); z-index: 999; justify-content: center; align-items: center;">
+        <div
+            style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 300px; text-align: center; position: relative;">
+            <span onclick="tutupSettingModal()"
+                style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
+            <h3>Pengaturan Akun</h3>
+            <button onclick="bukaMenu2FA()"
+                style="width: 100%; padding: 10px; margin-top: 15px; background: transparent; border: 1px solid #39FF14; color: #39FF14; border-radius: 5px; cursor: pointer;">🛡️
+                Aktifkan 2FA (TOTP)</button>
+            <button onclick="prosesLogout()"
+                style="width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid #ff4444; color: #ff4444; border-radius: 5px; cursor: pointer;">🚪
+                Keluar (Logout)</button>
+        </div>
     </div>
+    <div id="modal2FA" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.9); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 320px; text-align: center; position: relative;">
+            <span onclick="tutupModal2FA()" style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
+            
+            <h3 style="margin-top: 5px;">Scan QR Code</h3>
+            <p style="font-size: 12px; color: #8b949e; margin-bottom: 15px;">Gunakan aplikasi Authy atau Google Authenticator.</p>
+            
+            <div style="background: white; padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 15px;">
+                <span id="loadingQR" style="color: black; font-weight: bold;">Memuat QR...</span>
+                <img id="qrCodeImg" src="" style="display: none; width: 200px; height: 200px;" alt="QR 2FA">
+            </div>
+
+            <input type="hidden" id="tempSecret">
+            <input type="text" id="otpInput" class="form-input" placeholder="Masukkan 6 Digit OTP" style="text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold;" maxlength="6">
+            
+            <button class="btn" style="width: 100%;" onclick="verifikasiSetup2FA()">Verifikasi & Aktifkan</button>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <h2 style="margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">Form Pengiriman Barang
+            </h2>
+
+            <h4 style="color: #39FF14; margin-bottom: 10px;">1. Data Barang (Ter-enkripsi)</h4>
+            <label>Nama Barang / Kargo</label>
+            <input type="text" id="namaBarang" class="form-input" placeholder="Contoh: Laptop Asus ROG">
+
+            <label>Deskripsi Rahasia Barang</label>
+            <input type="text" id="deskripsiBarang" class="form-input"
+                placeholder="Masukkan serial number / isi paket rahasia">
+
+            <h4 style="color: #39FF14; margin-bottom: 10px; margin-top: 20px;">2. Data Penerima</h4>
+            <label>Nama Penerima</label>
+            <input type="text" id="namaPenerima" class="form-input" placeholder="Nama lengkap penerima">
+
+            <label>Alamat Tujuan</label>
+            <input type="text" id="alamatPenerima" class="form-input" placeholder="Alamat lengkap pengiriman">
+
+            <h4 style="color: #39FF14; margin-bottom: 10px; margin-top: 20px;">3. Jasa Ekspedisi</h4>
+            <label>Pilih Kurir Pengiriman</label>
+            <select id="jasaPengiriman" class="form-input">
+                <option value="FastSend Express">FastSend Express</option>
+                <option value="PastiSampai Logistik">PastiSampai Logistik</option>
+            </select>
+
+            <button id="btnSubmit" class="btn" style="width: 100%; margin-top: 15px;" onclick="simpanDanBuatResi()">Kunci Data & Buat
+                Resi</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. TANGKAP DATA DARI URL (Jika baru selesai Login dari port 8000)
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenUrl = urlParams.get('token');
+        const roleUrl = urlParams.get('role');
+        const usernameUrl = urlParams.get('username');
+
+        // Jika ada data di URL, simpan ke LocalStorage port 5500, lalu bersihkan URL-nya biar rapi
+        if (tokenUrl) {
+            localStorage.setItem('token_akses', tokenUrl);
+            localStorage.setItem('user_role', roleUrl);
+            localStorage.setItem('username', decodeURIComponent(usernameUrl));
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // 2. TAMPILKAN DATA DI NAVBAR
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = localStorage.getItem('user_role') || 'Unknown';
+            const username = localStorage.getItem('username') || 'Pengguna';
+
+            document.getElementById('roleTitle').innerText = role;
+            document.getElementById('displayUsername').innerText = username;
+
+            if (role === 'Kurir' || role === 'Admin') {
+                document.getElementById('displayEkspedisi').innerText = "Divisi Operasional";
+            } else {
+                document.getElementById('displayEkspedisi').innerText = "Mitra Bisnis";
+            }
+        });
+
+        // 3. FUNGSI POST DATA
+        async function simpanDanBuatResi() {
+            const btn = document.getElementById('btnSubmit');
+            const namaBarang = document.getElementById('namaBarang').value;
+            const deskripsiBarang = document.getElementById('deskripsiBarang').value;
+            const namaPenerima = document.getElementById('namaPenerima').value;
+            const alamatPenerima = document.getElementById('alamatPenerima').value;
+            const jasaPengiriman = document.getElementById('jasaPengiriman').value;
+
+            const token = localStorage.getItem('token_akses');
+            if (!token) { alert('Sesi habis, silakan login ulang!'); return; }
+
+            if (!namaBarang || !deskripsiBarang || !namaPenerima || !alamatPenerima) {
+                alert("Harap isi semua data!"); return;
+            }
+
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const idSupplier = parseInt(payload.sub);
+
+            btn.innerText = "Mengamankan Data & Membuat Resi...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/produk/tambah', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id_supplier: idSupplier,
+                        nama_produk: namaBarang,
+                        deskripsi_produk: deskripsiBarang,
+                        nama_penerima: namaPenerima,
+                        alamat_penerima: alamatPenerima,
+                        jasa_pengiriman: jasaPengiriman
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(`✅ SUKSES!\n\nNomor Resi: ${data.nomor_resi}\nKurir Penjemput: ${jasaPengiriman}\n\n*Catatan Keamanan: Deskripsi barang dan Alamat tujuan telah di-enkripsi di database.`);
+                    window.location.reload(); 
+                } else {
+                    alert("Gagal: " + data.detail);
+                    btn.innerText = "Kunci Data & Buat Resi";
+                }
+            } catch (err) {
+                alert("Gagal terhubung ke server keamanan.");
+                btn.innerText = "Kunci Data & Buat Resi";
+            }
+        }
+
+        // FUNGSI MODAL
+        function bukaSettingModal() { document.getElementById('modalSetting').style.display = 'flex'; }
+        function tutupSettingModal() { document.getElementById('modalSetting').style.display = 'none'; }
+        function prosesLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+        async function bukaMenu2FA() {
+            tutupSettingModal(); // Tutup modal gir
+            document.getElementById('modal2FA').style.display = 'flex';
+            document.getElementById('loadingQR').style.display = 'block';
+            document.getElementById('qrCodeImg').style.display = 'none';
+
+            const token = localStorage.getItem('token_akses');
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/generate', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('tempSecret').value = data.secret_key;
+                    document.getElementById('qrCodeImg').src = data.qr_code_url;
+                    
+                    // Hilangkan tulisan loading saat gambar sudah di-load
+                    document.getElementById('qrCodeImg').onload = () => {
+                        document.getElementById('loadingQR').style.display = 'none';
+                        document.getElementById('qrCodeImg').style.display = 'block';
+                    };
+                } else {
+                    alert("Gagal memuat 2FA: " + data.detail);
+                }
+            } catch (err) { alert("Server tidak merespon."); }
+        }
+
+        function tutupModal2FA() { document.getElementById('modal2FA').style.display = 'none'; }
+
+        async function verifikasiSetup2FA() {
+            const token = localStorage.getItem('token_akses');
+            const secret = document.getElementById('tempSecret').value;
+            const otpCode = document.getElementById('otpInput').value;
+
+            if (otpCode.length !== 6) { alert("Masukkan 6 digit angka OTP!"); return; }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/verify-setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ secret: secret, kode_otp: otpCode })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert("✅ " + data.pesan);
+                    tutupModal2FA();
+                } else {
+                    alert("❌ Gagal: " + data.detail);
+                }
+            } catch (err) { alert("Gagal verifikasi."); }
+        }
+    </script>
 </body>
+
 </html>
