@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -388,7 +387,6 @@
 </head>
 
 <body>
-
     <nav>
         <a href="#" class="logo">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--neon-green)" stroke-width="2"
@@ -477,42 +475,92 @@
             </form>
         </div>
     </div>
+    <div id="challenge2FAModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: var(--neon-green); margin-bottom: 10px;">Verifikasi Keamanan</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Akun Anda dilindungi oleh 2FA.
+                Masukkan 6 digit kode dari aplikasi Authenticator Anda.</p>
+
+            <input type="hidden" id="tempToken2FA">
+            <input type="text" id="otpLoginInput" class="form-input" placeholder="000000"
+                style="text-align: center; font-size: 24px; letter-spacing: 10px; font-weight: bold;" maxlength="6">
+
+            <button class="btn-neon" onclick="submitLogin2FA()"
+                style="width: 100%; border-radius: 10px; margin-top: 15px;">Verifikasi & Masuk</button>
+        </div>
+    </div>
 
     <section class="hero">
         <h1>Lacak Pengiriman <span>Supply Chain</span> Anda</h1>
         <p>Pantau pergerakan barang dari supplier, kurir, hingga sampai ke tangan Anda secara real-time.</p>
+        
         <div class="track-container">
-            <input type="text" id="resiInput" class="track-input"
-                placeholder="Masukkan Nomor Resi Anda (Contoh: TRX123456)">
+            <input type="text" id="resiInput" class="track-input" placeholder="Masukkan Nomor Resi Anda (Contoh: TRX-26-XXXXX)">
             <button class="btn-neon" onclick="lacakPaket()">Lacak Paket</button>
         </div>
+
+        <div id="errorTracking" style="color: #ff4444; margin-top: 15px; display: none; font-size: 14px; max-width: 600px;">
+            Pengiriman dengan nomor resi ini tidak ditemukan. Silakan cek ulang nomor resi yang Anda input atau hubungi customer call center untuk jasa pengiriman Anda.
+        </div>
+
         <div id="trackingResult">
-            <h3 style="color: var(--neon-green); margin-bottom: 10px;">Status: Sedang Dikirim</h3>
+            <h3 id="displayStatus" style="color: var(--neon-green); margin-bottom: 10px;">Status: ...</h3>
             <p><strong>Resi:</strong> <span id="displayResi"></span></p>
-            <p><strong>Posisi:</strong> Fasilitas Sortir Jakarta</p>
+            <p><strong>Posisi:</strong> <span id="displayLokasi"></span></p>
             <br>
-            <small style="color: var(--text-muted);">Diperbarui oleh Kurir: 15 menit yang lalu</small>
+            <small id="displayWaktu" style="color: var(--text-muted);"></small>
         </div>
     </section>
 
     <footer>
         <p>&copy; 2026 Domain Expired Track Logistics. Sistem Pelacakan Terpadu.</p>
+        <p>Dibuat oleh:</p>
+        <p>Samuel Jose Fernando- 160424135</p>
+        <p>Abraham Jeconiah Loasari- 160424126</p>
+        <p>Michael Jaya - 160424096</p>
+        <p>Artchie Leonhart - 160424132</p>
+        <p>Richard Gerard Soetanto - 160424099</p>
     </footer>
 
     <script>
-        // Logic Tracking
-        function lacakPaket() {
+        // Logic Tracking Real-Time
+        async function lacakPaket() {
             const input = document.getElementById('resiInput').value;
             const btn = document.querySelector('.hero .btn-neon');
+            const resultDiv = document.getElementById('trackingResult');
+            const errorDiv = document.getElementById('errorTracking');
 
             if (!input) return alert('Masukkan nomor resi!');
 
+            // Ubah tombol dan sembunyikan hasil sebelumnya
             btn.innerText = "Mencari...";
-            setTimeout(() => {
-                document.getElementById('displayResi').innerText = input.toUpperCase();
-                document.getElementById('trackingResult').style.display = 'block';
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            try {
+                // Tembak API Backend
+                const response = await fetch(`http://127.0.0.1:8000/pelacakan/track/${input}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Jika resi ketemu, masukkan data ke HTML
+                    document.getElementById('displayResi').innerText = data.nomor_resi;
+                    document.getElementById('displayStatus').innerText = "Status: " + data.status_pengiriman;
+                    document.getElementById('displayLokasi').innerText = data.lokasi_sekarang;
+                    document.getElementById('displayWaktu').innerText = "Terakhir diperbarui: " + data.waktu_diperbarui;
+                    
+                    // Tampilkan kotak hasil
+                    resultDiv.style.display = 'block';
+                } else {
+                    // Jika resi tidak ada (404), tampilkan tulisan merah
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                alert("Sistem pelacakan sedang sibuk atau server terputus.");
+            } finally {
+                // Kembalikan tombol ke semula
                 btn.innerText = "Lacak Paket";
-            }, 800);
+            }
         }
 
         // Memungkinkan user menekan "Enter"
@@ -580,40 +628,41 @@
                 btn.innerText = "Masuk Sekarang";
             }
         }
-        
+
         function loginGoogle() {
-        try {
-        // 1. Cek tab mana yang lagi aktif (Login atau Daftar)
-        const formDaftar = document.getElementById('formDaftar');
-        const isModeDaftar = formDaftar && formDaftar.classList.contains('active');
-        
-        let rolePilihan, mode;
+            try {
+                // 1. Cek tab mana yang lagi aktif (Login atau Daftar)
+                const formDaftar = document.getElementById('formDaftar');
+                const isModeDaftar = formDaftar && formDaftar.classList.contains('active');
 
-        if (isModeDaftar) {
-            mode = 'register';
-            // Cari dropdown di dalam form daftar (pakai querySelector biar lebih akurat)
-            const selectDaftar = document.querySelector('#formDaftar select');
-            rolePilihan = selectDaftar ? selectDaftar.value : 'Supplier';
-        } else {
-            mode = 'login';
-            // Cari dropdown di dalam form login
-            const selectLogin = document.getElementById('loginRole');
-            rolePilihan = selectLogin ? selectLogin.value : 'Supplier';
+                let rolePilihan, mode;
+
+                if (isModeDaftar) {
+                    mode = 'register';
+                    // Cari dropdown di dalam form daftar (pakai querySelector biar lebih akurat)
+                    const selectDaftar = document.querySelector('#formDaftar select');
+                    rolePilihan = selectDaftar ? selectDaftar.value : 'Supplier';
+                } else {
+                    mode = 'login';
+                    // Cari dropdown di dalam form login
+                    const selectLogin = document.getElementById('loginRole');
+                    rolePilihan = selectLogin ? selectLogin.value : 'Supplier';
+                }
+
+                // 2. Validasi Terakhir: Kalau rolePilihan masih kosong, paksa ke Supplier
+                if (!rolePilihan) rolePilihan = 'Supplier';
+
+                console.log(`🚀 Meluncur ke Google SSO! Mode: ${mode}, Role: ${rolePilihan}`);
+
+                // 3. Eksekusi Pindah ke Backend
+                window.location.href = `http://127.0.0.1:8000/auth/login?role=${rolePilihan}&mode=${mode}`;
+
+            } catch (err) {
+                console.error("Waduh, ada error di JS:", err);
+                alert("Gagal memproses login Google. Cek konsol F12!");
+            }
         }
-
-        // 2. Validasi Terakhir: Kalau rolePilihan masih kosong, paksa ke Supplier
-        if (!rolePilihan) rolePilihan = 'Supplier';
-
-        console.log(`🚀 Meluncur ke Google SSO! Mode: ${mode}, Role: ${rolePilihan}`);
-
-        // 3. Eksekusi Pindah ke Backend
-        window.location.href = `http://127.0.0.1:8000/auth/login?role=${rolePilihan}&mode=${mode}`;
         
-        } catch (err) {
-            console.error("Waduh, ada error di JS:", err);
-            alert("Gagal memproses login Google. Cek konsol F12!");
-        }
-    }
         // Logic Daftar
         function prosesDaftar(event) {
             event.preventDefault();
@@ -625,6 +674,55 @@
                 switchTab('login'); // Pindahkan user kembali ke tab login otomatis
                 btn.innerText = "Buat Akun";
             }, 1000);
+        }
+
+        // --- LOGIKA PENANGANAN LOGIN 2FA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const require2FA = urlParams.get('require_2fa');
+            const tempToken = urlParams.get('temp_token');
+
+            if (require2FA === 'true' && tempToken) {
+                // Munculkan Modal 2FA dan simpan token sementara
+                document.getElementById('challenge2FAModal').style.display = 'block';
+                document.getElementById('tempToken2FA').value = tempToken;
+
+                // Bersihkan URL agar rapi
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+        async function submitLogin2FA() {
+            const tempToken = document.getElementById('tempToken2FA').value;
+            const otpCode = document.getElementById('otpLoginInput').value;
+
+            if (otpCode.length !== 6) {
+                alert("Masukkan 6 digit kode OTP!"); return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/verify-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ temp_token: tempToken, kode_otp: otpCode })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Simpan Token Asli ke LocalStorage
+                    localStorage.setItem('token_akses', result.access_token);
+                    localStorage.setItem('user_role', result.role);
+                    localStorage.setItem('username', result.username);
+
+                    alert("Verifikasi Berhasil! Mengarahkan ke Dashboard...");
+                    window.location.href = `dashboard-${result.role.toLowerCase()}.html`;
+                } else {
+                    alert("Gagal: " + result.detail);
+                }
+            } catch (err) {
+                alert("Koneksi ke server gagal.");
+            }
         }
     </script>
 </body>

@@ -6,16 +6,24 @@ from routes import produk, auth, pelacakan
 from starlette.middleware.sessions import SessionMiddleware
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="Secure Supply Chain API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Di tahap dev, kita izinkan semua
+    allow_origins=["http://127.0.0.1:5500", "http://localhost:5500"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "super-rahasia-banget"))
+app.add_middleware(
+    SessionMiddleware, 
+    secret_key=os.getenv("SECRET_KEY", "super-rahasia-banget"), 
+    same_site="lax", 
+    max_age=3600)
+
 app.include_router(produk.router)
 app.include_router(auth.router)
 app.include_router(pelacakan.router)

@@ -1,12 +1,14 @@
-# init_db.py
-from database import engine, Base
-from models import schemas # Pastikan path ini benar sesuai strukturmu
+from database import engine
+from models import schemas # Pastikan ini mengarah ke folder models kamu
 
-print("Sedang membuat tabel di database...")
-try:
-    # Ini akan membuat semua tabel yang terdaftar di Base.metadata
-    Base.metadata.create_all(bind=engine)
-    print("Berhasil! Silakan cek phpMyAdmin, tabel seharusnya sudah muncul.")
-except Exception as e:
-    print(f"Gagal konek ke database: {e}")
+def buat_tabel_sekarang():
+    print("⏳ Menghubungkan ke Aiven Singapura...")
+    try:
+        # Perintah sakti untuk membuat semua tabel yang ada di models/schemas.py
+        schemas.Base.metadata.create_all(bind=engine)
+        print("✅ Berhasil! Semua tabel dan kolom sudah tercipta di Cloud.")
+    except Exception as e:
+        print(f"❌ Gagal: {e}")
 
+if __name__ == "__main__":
+    buat_tabel_sekarang()

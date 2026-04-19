@@ -9,10 +9,13 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from jose import jwt
 from security.rbac import SECRET_KEY, ALGORITHM
+from pydantic import BaseModel
+from typing import Optional
+import urllib.parse
 
 router = APIRouter(prefix="/auth", tags=["Autentikasi & Keamanan"])
 
-# --- 1. SETUP OAUTH GOOGLE ---
+# --- SETUP OAUTH GOOGLE ---
 config = Config(".env")
 oauth = OAuth(config)
 oauth.register(
@@ -21,7 +24,7 @@ oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
-# --- 2. ROUTE LOGIN GOOGLE ---
+# --- ROUTE LOGIN GOOGLE ---
 @router.get("/login")
 async def login_via_google(request: Request, role: str = "Supplier", mode: str = "login"):
     # Titip ROLE dan MODE di session
@@ -29,8 +32,9 @@ async def login_via_google(request: Request, role: str = "Supplier", mode: str =
     request.session['auth_mode'] = mode
     
     redirect_uri = request.url_for('auth_callback')
-    return await oauth.google.authorize_redirect(request, redirect_uri)
+    return await oauth.google.authorize_redirect(request, redirect_uri, prompt='select_account')
 
+# --- FITUR REGISTER & LOGIN ---
 @router.get("/callback")
 async def auth_callback(request: Request, db: Session = Depends(get_db)):
     try:
@@ -38,148 +42,158 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
         user_info = token.get('userinfo')
         email_google = user_info.get("email")
         
-        # Ambil niat user dari session (login atau register?)
         mode = request.session.get('auth_mode', 'login')
         user_db = db.query(Pengguna).filter(Pengguna.email == email_google).first()
 
-        # --- LOGIKA PENGECEKAN KEAMANAN (ISA) ---
-        
-        # SKENARIO A: User mau DAFTAR, tapi email SUDAH ADA
+        # SKENARIO 1: Mau Daftar, tapi Email sudah ada
         if mode == 'register' and user_db:
             return HTMLResponse(content=f"""
                 <script>
-                    alert('Gagal Daftar: Email {email_google} sudah terdaftar! Silakan gunakan menu Login.');
+                    alert(`Gagal Daftar: Email {email_google} sudah terdaftar! Silakan gunakan menu Login.`);
                     window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html';
                 </script>
             """)
 
-        # SKENARIO B: User mau LOGIN, tapi email BELUM TERDAFTAR
+        # SKENARIO 2: Mau Login, tapi Email belum ada
         if mode == 'login' and not user_db:
             return HTMLResponse(content="""
                 <script>
-                    alert('Email tidak ditemukan! Silakan daftar akun terlebih dahulu.');
+                    alert(`Email tidak ditemukan! Silakan daftar akun terlebih dahulu.`);
                     window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html';
                 </script>
             """)
 
-        # SKENARIO C: User DAFTAR BARU (Email benar-benar belum ada)
+        # SKENARIO 3: User DAFTAR BARU
         if mode == 'register' and not user_db:
-            role_pilihan = request.session.get('requested_role', 'Supplier')
-            user_db = Pengguna(
-                username=email_google.split('@')[0],
-                email=email_google,
-                password_hash="sso_google_account",
-                role=role_pilihan
-            )
-            db.add(user_db)
-            db.commit()
-            db.refresh(user_db)
+            request.session['temp_email'] = email_google
+            request.session['temp_nama'] = user_info.get("name")
+            return HTMLResponse(content=f"""
+                <script>
+                    alert(`Autentikasi Google Berhasil! Silakan lengkapi peran dan jasa logistik Anda.`);
+                    window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/setup-role.html';
+                </script>
+            """)
 
-        # --- JIKA LOLOS PENGECEKAN, BUAT TOKEN ---
-        token_data = {"role": user_db.role, "sub": str(user_db.id_pengguna)}
-        access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-        target_dashboard = f"dashboard-{user_db.role.lower()}.html"
-        
+        # SKENARIO 4: LOGIN BERHASIL
+        if user_db.totp_secret:
+            # JIKA PUNYA 2FA: Buat token sementara, lempar ke halaman depan untuk minta OTP
+            temp_data = {"sub": str(user_db.id_pengguna), "type": "temp_2fa"}
+            temp_token = jwt.encode(temp_data, SECRET_KEY, algorithm=ALGORITHM)
+            return HTMLResponse(content=f"""
+                <script>
+                    window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html?require_2fa=true&temp_token={temp_token}';
+                </script>
+            """)
+        else:
+            # JIKA TIDAK PUNYA 2FA: Langsung masuk seperti biasa
+            token_data = {"role": user_db.role, "sub": str(user_db.id_pengguna)}
+            access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+            target_dashboard = f"dashboard-{user_db.role.lower()}.html"
+            
+            return HTMLResponse(content=f"""
+                <script>
+                    const targetUrl = 'http://127.0.0.1:5500/frontend-supply-chain/{target_dashboard}?token={access_token}&role={user_db.role}&username=' + encodeURIComponent('{user_db.username}');
+                    window.location.href = targetUrl;
+                </script>
+            """)
+    except Exception as e:
+        # Menghapus karakter backtick dari pesan error agar tidak merusak JS
+        error_msg = str(e).replace('`', "'")
         return HTMLResponse(content=f"""
             <script>
-                localStorage.setItem('token_akses', '{access_token}');
-                localStorage.setItem('user_role', '{user_db.role}');
-                alert('Berhasil! Selamat datang {user_info.get('name')}');
-                window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/{target_dashboard}';
+                alert(`Terjadi Error: {error_msg}`);
+                window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html';
             </script>
         """)
 
-    except Exception as e:
-        return HTMLResponse(content=f"<script>alert('Error: {str(e)}'); window.location.href='http://127.0.0.1:5500/frontend-supply-chain/index.html';</script>")
-    try:
-        token = await oauth.google.authorize_access_token(request)
-        user_info = token.get('userinfo')
-        email_google = user_info.get("email")
-        nama_google = user_info.get("name")
+class FinalisasiRegister(BaseModel):
+    role: str
+    jasa_logistik: Optional[str] = None # Opsional untuk Supplier
 
-        user_db = db.query(Pengguna).filter(Pengguna.email == email_google).first()
-        
-        # JIKA USER BELUM ADA -> DAFTARKAN OTOMATIS
-        if not user_db:
-            role_pilihan = request.session.get('requested_role', 'Supplier')
-            user_db = Pengguna(
-                username=email_google.split('@')[0], # Buat username dari email
-                email=email_google,
-                password_hash="sso_google_account", # Penanda login via SSO
-                role=role_pilihan
-            )
-            db.add(user_db)
-            db.commit()
-            db.refresh(user_db)
+@router.post("/complete-registration")
+def selesaikan_pendaftaran(data: FinalisasiRegister, request: Request, db: Session = Depends(get_db)):
+    email_baru = request.session.get('temp_email')
+    nama_baru = request.session.get('temp_nama', 'User')
 
-        # Buat Token Akses seperti biasa
-        token_data = {"role": user_db.role, "sub": str(user_db.id_pengguna)}
-        access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    if not email_baru:
+        raise HTTPException(status_code=400, detail="Sesi pendaftaran habis. Ulangi login Google.")
 
-        target_dashboard = f"dashboard-{user_db.role.lower()}.html"
-        
-        # Script redirect ke Live Server (Sesuaikan path folder kamu)
-        html_content = f"""
-        <script>
-            localStorage.setItem('token_akses', '{access_token}');
-            localStorage.setItem('user_role', '{user_db.role}');
-            alert('Sukses! Selamat datang di Portal {user_db.role}');
-            window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/{target_dashboard}';
-        </script>
-        """
-        return HTMLResponse(content=html_content)
-    except Exception as e:
-        return HTMLResponse(content=f"<script>alert('Gagal: {str(e)}'); window.location.href='/';</script>")
-    try:
-        token = await oauth.google.authorize_access_token(request)
-        user_info = token.get('userinfo')
-        email_google = user_info.get("email")
+    # 1. Insert ke Database sekarang
+    user_baru = Pengguna(
+        username=email_baru.split('@')[0],
+        email=email_baru,
+        password_hash="sso_google_account",
+        role=data.role,
+        jasa_logistik=data.jasa_logistik
+    )
+    db.add(user_baru)
+    db.commit()
+    db.refresh(user_baru)
 
-        user_db = db.query(Pengguna).filter(Pengguna.email == email_google).first()
-        
-        if not user_db:
-            return HTMLResponse(content="<script>alert('Akses Ditolak: Email tidak terdaftar.'); window.location.href='/';</script>")
+    # 2. Hapus session agar bersih
+    request.session.pop('temp_email', None)
+    request.session.pop('temp_nama', None)
 
-        # Buat Token Akses (JWT)
-        token_data = {"role": user_db.role, "sub": str(user_db.id_pengguna)}
-        access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    return {"status": "sukses", "pesan": "Akun berhasil dibuat! Silakan login di halaman utama."}
 
-        # Redirect otomatis ke Live Server dashboard sesuai Role
-        target_dashboard = f"dashboard-{user_db.role.lower()}.html"
-        
-        html_content = f"""
-        <script>
-            localStorage.setItem('token_akses', '{access_token}');
-            localStorage.setItem('user_role', '{user_db.role}');
-            alert('Login Google Berhasil! Selamat datang, {user_info.get('name')}');
-            window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/{target_dashboard}';
-        </script>
-        """
-        return HTMLResponse(content=html_content)
-    except Exception as e:
-        return HTMLResponse(content=f"<script>alert('Gagal SSO: {str(e)}'); window.location.href='/';</script>")
+# --- FITUR 2FA ---
+class VerifySetup(BaseModel):
+    secret: str
+    kode_otp: str
 
-# --- 4. FITUR 2FA ---
 @router.get("/2fa/generate")
-def generate_2fa_secret(email: str):
+def generate_2fa_secret(request: Request, db: Session = Depends(get_db)):
+    # 1. Ambil ID User dari Token JWT (Otorisasi)
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        raise HTTPException(status_code=401, detail="Sesi tidak valid")
+    
+    token = auth_header.split(" ")[1]
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    user_id = int(payload.get("sub"))
+    
+    user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()
+    
+    # 2. Buat Kunci Rahasia dan URI Authenticator
     secret = pyotp.random_base32()
-    totp_uri = pyotp.totp.TOTP(secret).provisioning_uri(name=email, issuer_name="Secure Supply Chain ISA")
+    totp_uri = pyotp.totp.TOTP(secret).provisioning_uri(name=user.email, issuer_name="Secure Supply Chain ISA")
+    
+    # 3. Konversi URI jadi QR Code Image menggunakan API eksternal agar mudah di-scan
+    encoded_uri = urllib.parse.quote(totp_uri)
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?data={encoded_uri}&size=200x200"
+    
     return {
-        "pesan": "Masukkan Secret ini ke Google Authenticator Anda",
         "secret_key": secret,
-        "qr_code_url": totp_uri
+        "qr_code_url": qr_url
     }
 
-@router.post("/2fa/verify")
-def verify_2fa(secret: str, kode_otp: str):
-    totp = pyotp.TOTP(secret)
-    if totp.verify(kode_otp):
-        # Di sini kita buat token dummy untuk testing via Swagger
-        token_data = {"role": "Supplier", "sub": "1"} 
-        access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-        return {
-            "status": "Login Sepenuhnya Berhasil!",
-            "access_token": access_token,
-            "role": "Supplier"
-        }
-    raise HTTPException(status_code=401, detail="Kode OTP Salah atau Expired!")
+class VerifyLogin2FA(BaseModel):
+    temp_token: str
+    kode_otp: str
+
+@router.post("/2fa/verify-login")
+def verify_login_2fa(data: VerifyLogin2FA, db: Session = Depends(get_db)):
+    try:
+        # Dekode token sementara
+        payload = jwt.decode(data.temp_token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "temp_2fa":
+            raise HTTPException(status_code=400, detail="Token tidak valid")
+        
+        user_id = int(payload.get("sub"))
+        user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()
+        
+        # Cek OTP dengan secret di database
+        totp = pyotp.TOTP(user.totp_secret)
+        if totp.verify(data.kode_otp):
+            # Jika benar, berikan Token Asli
+            token_data = {"role": user.role, "sub": str(user.id_pengguna)}
+            access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+            return {
+                "access_token": access_token,
+                "role": user.role,
+                "username": user.username
+            }
+        else:
+            raise HTTPException(status_code=401, detail="Kode OTP Salah atau Expired!")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Sesi login kedaluwarsa, silakan login ulang.")

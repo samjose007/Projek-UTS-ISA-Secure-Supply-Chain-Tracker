@@ -11,38 +11,46 @@ from security.rbac import role_required
 router = APIRouter(prefix="/pelacakan", tags=["Logistik & Blockchain"])
 
 class LogBaru(BaseModel):
-    id_pengiriman: int
+    nomor_resi: str # Menggunakan resi agar kurir mudah input
     id_pengguna: int
-    aksi_pelacakan: str # Contoh: "Paket tiba di Gudang Surabaya"
+    aksi_pelacakan: str 
     lokasi_pelacakan: str
     catatan_tambahan: str = None
 
 @router.post("/update-status", dependencies=[Depends(role_required(["Kurir", "Admin"]))])
 def update_status_barang(log_input: LogBaru, db: Session = Depends(get_db)):
-    # 1. Cari log terakhir dari pengiriman ini untuk mengambil hash sebelumnya
+    # 1. Validasi: Cari pengiriman berdasarkan nomor resi
+    pengiriman = db.query(Pengiriman).filter(Pengiriman.nomor_resi == log_input.nomor_resi).first()
+    
+    if not pengiriman:
+        raise HTTPException(status_code=404, detail="Nomor Resi tidak ditemukan di database. Pastikan resi valid!")
+
+    id_pengiriman_valid = pengiriman.id_pengiriman
+
+    # 2. Update data utama di tabel pengiriman
+    pengiriman.status_pengiriman = log_input.aksi_pelacakan
+    pengiriman.lokasi_sekarang = log_input.lokasi_pelacakan
+    pengiriman.id_kurir = log_input.id_pengguna
+    pengiriman.waktu_diperbarui = datetime.utcnow()
+
+    # 3. Cari log terakhir untuk menyambung rantai (Blockchain Hash)
     log_terakhir = db.query(LogPelacakan).\
-        filter(LogPelacakan.id_pengiriman == log_input.id_pengiriman).\
+        filter(LogPelacakan.id_pengiriman == id_pengiriman_valid).\
         order_by(desc(LogPelacakan.id_log)).first()
 
-    # 2. Tentukan hash sebelumnya (Jika pertama kali, pakai genesis hash: 64 nol)
     hash_sebelumnya = log_terakhir.hash_sekarang if log_terakhir else "0" * 64
-    
-    # 3. Siapkan objek log baru (Waktu ambil sekarang)
     waktu_sekarang = datetime.utcnow()
     
-    # Kita butuh ID log selanjutnya (simulasi) atau biarkan DB generate dulu
-    # Untuk hashing yang akurat, biasanya kita simpan dulu tanpa hash, lalu update.
-    # Tapi untuk simplifikasi tugas ISA, kita hash data input + hash_sebelumnya.
-    
     hash_baru = generate_hash(
-        id_log=0, # Dummy ID karena belum masuk DB
+        id_log=0, 
         aksi_pelacakan=log_input.aksi_pelacakan,
         waktu_log=waktu_sekarang,
         hash_sebelumnya=hash_sebelumnya
     )
 
+    # 4. Simpan Log Baru
     new_log = LogPelacakan(
-        id_pengiriman=log_input.id_pengiriman,
+        id_pengiriman=id_pengiriman_valid,
         id_pengguna=log_input.id_pengguna,
         aksi_pelacakan=log_input.aksi_pelacakan,
         lokasi_pelacakan=log_input.lokasi_pelacakan,
@@ -54,12 +62,11 @@ def update_status_barang(log_input: LogBaru, db: Session = Depends(get_db)):
 
     db.add(new_log)
     db.commit()
-    db.refresh(new_log)
 
     return {
-        "status": "Log Tercatat",
+        "status": "sukses",
         "hash_terbentuk": hash_baru,
-        "detail": "Data telah dikunci ke dalam rantai log."
+        "detail": f"Status resi {log_input.nomor_resi} berhasil diperbarui!"
     }
 
 @router.get("/verifikasi/{id_pengiriman}")
@@ -101,4 +108,20 @@ def verifikasi_integritas_log(id_pengiriman: int, db: Session = Depends(get_db))
     return {
         "integritas": "AMAN",
         "pesan": "Semua data asli dan urutan rantai valid."
+    }
+
+@router.get("/track/{nomor_resi}")
+def lacak_resi_publik(nomor_resi: str, db: Session = Depends(get_db)):
+    # Cari pengiriman berdasarkan nomor resi
+    pengiriman = db.query(Pengiriman).filter(Pengiriman.nomor_resi == nomor_resi).first()
+    
+    if not pengiriman:
+        raise HTTPException(status_code=404, detail="Resi tidak ditemukan")
+    
+    # Kembalikan data untuk ditampilkan di frontend
+    return {
+        "nomor_resi": pengiriman.nomor_resi,
+        "status_pengiriman": pengiriman.status_pengiriman,
+        "lokasi_sekarang": pengiriman.lokasi_sekarang,
+        "waktu_diperbarui": pengiriman.waktu_diperbarui.strftime("%d-%m-%Y %H:%M") if pengiriman.waktu_diperbarui else "Baru saja"
     }
