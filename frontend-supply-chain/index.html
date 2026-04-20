@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -265,6 +266,8 @@
             box-shadow: 0 0 30px rgba(57, 255, 20, 0.15);
             position: relative;
             animation: slideDown 0.3s ease-out;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         @keyframes slideDown {
@@ -383,6 +386,9 @@
                 width: 100%;
             }
         }
+
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 3px; }
     </style>
 </head>
 
@@ -459,19 +465,28 @@
                 </div>
                 <div class="form-group">
                     <label>Daftar Sebagai (Role)</label>
-                    <select class="form-select" required>
+                    <select class="form-select" id="regRole" onchange="toggleJasaRegister()" required>
                         <option value="Supplier">Supplier</option>
                         <option value="Kurir">Kurir</option>
+                        <option value="Admin">Admin</option>
                     </select>
                 </div>
+
+                <div class="form-group" id="regJasaGroup" style="display: none;">
+                    <label>Perusahaan Jasa Logistik</label>
+                    <select class="form-select" id="regJasa">
+                        <option value="" disabled selected>-- Pilih Jasa Pengiriman --</option>
+                        <option value="FastSend Express">FastSend Express</option>
+                        <option value="PastiSampai Logistik">PastiSampai Logistik</option>
+                    </select>
+                </div>
+
                 <div class="divider">Or register with:</div>
                 <button type="button" class="btn-google" onclick="loginGoogle()">
-                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google Logo"
-                        width="18">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google Logo" width="18">
                     Google
                 </button>
-                <button type="submit" id="btnSubmitDaftar" class="btn-neon"
-                    style="width: 100%; border-radius: 10px; margin-top: 10px;">Buat Akun</button>
+                <button type="submit" id="btnSubmitDaftar" class="btn-neon" style="width: 100%; border-radius: 10px; margin-top: 10px;">Buat Akun</button>
             </form>
         </div>
     </div>
@@ -493,14 +508,17 @@
     <section class="hero">
         <h1>Lacak Pengiriman <span>Supply Chain</span> Anda</h1>
         <p>Pantau pergerakan barang dari supplier, kurir, hingga sampai ke tangan Anda secara real-time.</p>
-        
+
         <div class="track-container">
-            <input type="text" id="resiInput" class="track-input" placeholder="Masukkan Nomor Resi Anda (Contoh: TRX-26-XXXXX)">
+            <input type="text" id="resiInput" class="track-input"
+                placeholder="Masukkan Nomor Resi Anda (Contoh: TRX-26-XXXXX)">
             <button class="btn-neon" onclick="lacakPaket()">Lacak Paket</button>
         </div>
 
-        <div id="errorTracking" style="color: #ff4444; margin-top: 15px; display: none; font-size: 14px; max-width: 600px;">
-            Pengiriman dengan nomor resi ini tidak ditemukan. Silakan cek ulang nomor resi yang Anda input atau hubungi customer call center untuk jasa pengiriman Anda.
+        <div id="errorTracking"
+            style="color: #ff4444; margin-top: 15px; display: none; font-size: 14px; max-width: 600px;">
+            Pengiriman dengan nomor resi ini tidak ditemukan. Silakan cek ulang nomor resi yang Anda input atau hubungi
+            customer call center untuk jasa pengiriman Anda.
         </div>
 
         <div id="trackingResult">
@@ -525,7 +543,7 @@
     <script>
         // Logic Tracking Real-Time
         async function lacakPaket() {
-            const input = document.getElementById('resiInput').value;
+            const input = document.getElementById('resiInput').value.trim();
             const btn = document.querySelector('.hero .btn-neon');
             const resultDiv = document.getElementById('trackingResult');
             const errorDiv = document.getElementById('errorTracking');
@@ -539,7 +557,7 @@
 
             try {
                 // Tembak API Backend
-                const response = await fetch(`http://127.0.0.1:8000/pelacakan/track/${input}`);
+                const response = await fetch(`http://127.0.0.1:8000/pelacakan/track/${encodeURIComponent(input)}`);
                 const data = await response.json();
 
                 if (response.ok) {
@@ -548,7 +566,7 @@
                     document.getElementById('displayStatus').innerText = "Status: " + data.status_pengiriman;
                     document.getElementById('displayLokasi').innerText = data.lokasi_sekarang;
                     document.getElementById('displayWaktu').innerText = "Terakhir diperbarui: " + data.waktu_diperbarui;
-                    
+
                     // Tampilkan kotak hasil
                     resultDiv.style.display = 'block';
                 } else {
@@ -589,43 +607,99 @@
             }
         }
 
+        // Fungsi untuk memunculkan/menyembunyikan pilihan Jasa Logistik saat daftar
+        function toggleJasaRegister() {
+            const role = document.getElementById('regRole').value;
+            const jasaGroup = document.getElementById('regJasaGroup');
+            
+            if (role === 'Kurir' || role === 'Admin') {
+                jasaGroup.style.display = 'block';
+            } else {
+                jasaGroup.style.display = 'none';
+                document.getElementById('regJasa').value = ""; // Reset pilihan
+            }
+        }
         // Logic Login Redirection
         async function prosesLogin(event) {
             event.preventDefault();
-
             const identifier = document.getElementById('loginId').value;
             const password = document.getElementById('loginPass').value;
-            const role = document.getElementById('loginRole').value;
             const btn = document.getElementById('btnSubmitLogin');
 
             btn.innerText = "Memverifikasi...";
 
             try {
-                // Simulasi hit API Verify 2FA (Anggap user sudah input OTP di modal)
-                // Di sistem asli, kamu perlu modal tambahan untuk input OTP
-                const otpInput = prompt("Masukkan 6 digit kode dari Google Authenticator:");
-
-                const response = await fetch(`http://127.0.0.1:8000/auth/2fa/verify?secret=KODE_SECRET_USER&kode_otp=${otpInput}`, {
+                const response = await fetch('http://127.0.0.1:8000/auth/login-manual', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier: identifier, password: password })
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    // SIMPAN TOKEN KE BROWSER
-                    localStorage.setItem('token_akses', result.access_token);
-                    localStorage.setItem('user_role', result.role);
-
-                    alert("Login Berhasil! Mengarahkan ke Dashboard...");
-                    window.location.href = `dashboard-${result.role.toLowerCase()}.html`;
+                    if (result.require_2fa) {
+                        document.getElementById('challenge2FAModal').style.display = 'block';
+                        document.getElementById('tempToken2FA').value = result.temp_token;
+                        tutupModalAuth();
+                    } else {
+                        sessionStorage.setItem('token_akses', result.access_token);
+                        alert("Login Berhasil!");
+                        window.location.href = `dashboard-${result.role.toLowerCase()}.html`;
+                    }
                 } else {
                     alert("Gagal: " + result.detail);
-                    btn.innerText = "Masuk Sekarang";
                 }
-            } catch (err) {
-                alert("Server tidak merespon. Pastikan Uvicorn jalan!");
-                btn.innerText = "Masuk Sekarang";
+            } catch (err) { alert("Server tidak merespon."); }
+            finally { btn.innerText = "Masuk Sekarang"; }
+        }
+
+        async function prosesDaftar(event) {
+            event.preventDefault();
+            const form = document.getElementById('formDaftar');
+            const username = form.querySelector('input[placeholder="Nama lengkap atau username"]').value;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+            
+            // Ambil dari ID yang baru dibuat
+            const role = document.getElementById('regRole').value;
+            const jasa = document.getElementById('regJasa').value;
+
+            // Validasi: Cegah submit jika Admin/Kurir belum memilih jasa
+            if ((role === 'Kurir' || role === 'Admin') && !jasa) {
+                alert("Harap pilih Perusahaan Jasa Logistik terlebih dahulu!");
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitDaftar');
+            btn.innerText = "Memproses...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        username: username, 
+                        email: email, 
+                        password: password, 
+                        role: role, 
+                        jasa_logistik: (role === 'Kurir' || role === 'Admin') ? jasa : null 
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Registrasi Berhasil! Silakan Login menggunakan akun baru Anda.");
+                    form.reset(); // Bersihkan isi form
+                    toggleJasaRegister(); // Reset tampilan form jasa
+                    switchTab('login');
+                } else {
+                    const err = await response.json();
+                    alert("Gagal: " + err.detail);
+                }
+            } catch (err) { 
+                alert("Kesalahan koneksi ke server."); 
+            } finally {
+                btn.innerText = "Buat Akun";
             }
         }
 
@@ -662,19 +736,6 @@
                 alert("Gagal memproses login Google. Cek konsol F12!");
             }
         }
-        
-        // Logic Daftar
-        function prosesDaftar(event) {
-            event.preventDefault();
-            const btn = document.getElementById('btnSubmitDaftar');
-            btn.innerText = "Membuat Akun...";
-            setTimeout(() => {
-                alert("Akun berhasil dibuat! Silakan masuk menggunakan akun baru Anda.");
-                document.getElementById('formDaftar').reset();
-                switchTab('login'); // Pindahkan user kembali ke tab login otomatis
-                btn.innerText = "Buat Akun";
-            }, 1000);
-        }
 
         // --- LOGIKA PENANGANAN LOGIN 2FA ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -710,10 +771,10 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Simpan Token Asli ke LocalStorage
-                    localStorage.setItem('token_akses', result.access_token);
-                    localStorage.setItem('user_role', result.role);
-                    localStorage.setItem('username', result.username);
+                    // Simpan Token Asli ke SessionStorage
+                    sessionStorage.setItem('token_akses', result.access_token);
+                    sessionStorage.setItem('user_role', result.role);
+                    sessionStorage.setItem('username', result.username);
 
                     alert("Verifikasi Berhasil! Mengarahkan ke Dashboard...");
                     window.location.href = `dashboard-${result.role.toLowerCase()}.html`;

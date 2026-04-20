@@ -1,27 +1,89 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Kurir - Secure Tracking</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0d1117; color: white; font-family: 'Poppins', sans-serif; padding: 20px; margin: 0; }
-        
+        body {
+            background-color: #0d1117;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
         /* Navbar & Header */
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 15px; margin-bottom: 30px; }
-        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #39FF14;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
         /* Form Centering */
-        .main-wrapper { display: flex; justify-content: center; align-items: center; min-height: 70vh; }
-        .container { background: #161b22; padding: 40px; border-radius: 15px; border: 1px solid rgba(57,255,20,0.3); width: 100%; max-width: 450px; box-shadow: 0 0 30px rgba(0,0,0,0.5); text-align: left; }
-        
-        .form-input { width: 100%; background: #0d1117; border: 1px solid #333; color: white; padding: 12px 15px; margin: 10px 0 20px; border-radius: 8px; outline: none; }
-        .form-input:focus { border-color: #39FF14; box-shadow: 0 0 10px rgba(57,255,20,0.1); }
-        .btn { background: #39FF14; color: black; padding: 12px 20px; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; font-size: 15px; transition: 0.3s;}
-        .btn:hover { box-shadow: 0 0 15px rgba(57,255,20,0.4); transform: scale(1.02); }
-        
+        .main-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+        }
+
+        .container {
+            background: #161b22;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            text-align: left;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px 15px;
+            margin: 10px 0 20px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #39FF14;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.1);
+        }
+
+        .btn {
+            background: #39FF14;
+            color: black;
+            padding: 12px 20px;
+            border: none;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+            transform: scale(1.02);
+        }
+
         /* Label Styling */
-        label { color: #8b949e; font-size: 13px; font-weight: 600; }
+        label {
+            color: #8b949e;
+            font-size: 13px;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -33,25 +95,57 @@
                 <div id="displayUsername" style="font-weight: bold; font-size: 16px;">Loading...</div>
                 <div id="displayEkspedisi" style="font-size: 12px; color: #8b949e;">Loading...</div>
             </div>
-            <button onclick="bukaSettingModal()" style="background: transparent; border: none; color: #39FF14; cursor: pointer;">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <button onclick="bukaSettingModal()"
+                style="background: transparent; border: none; color: #39FF14; cursor: pointer;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
             </button>
         </div>
     </div>
 
-    <div id="modalSetting" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.8); z-index: 999; justify-content: center; align-items: center;">
-        <div style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 300px; text-align: center; position: relative;">
-            <span onclick="tutupSettingModal()" style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
+    <div id="modalSetting"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.8); z-index: 999; justify-content: center; align-items: center;">
+        <div
+            style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 300px; text-align: center; position: relative;">
+            <span onclick="tutupSettingModal()"
+                style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
             <h3>Pengaturan Akun</h3>
-            <button onclick="bukaMenu2FA()" style="width: 100%; padding: 10px; margin-top: 15px; background: transparent; border: 1px solid #39FF14; color: #39FF14; border-radius: 5px; cursor: pointer;">🛡️ Aktifkan 2FA (TOTP)</button>
-            <button onclick="prosesLogout()" style="width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid #ff4444; color: #ff4444; border-radius: 5px; cursor: pointer;">🚪 Keluar (Logout)</button>
+            <button id="btnToggle2FA" onclick="bukaMenu2FA()"
+                style="width: 100%; padding: 10px; margin-top: 15px; background: transparent; border: 1px solid #39FF14; color: #39FF14; border-radius: 5px; cursor: pointer;">🛡️
+                Aktifkan 2FA (TOTP)</button>
+            <button onclick="prosesLogout()"
+                style="width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid #ff4444; color: #ff4444; border-radius: 5px; cursor: pointer;">🚪
+                Keluar (Logout)</button>
+        </div>
+    </div>
+    <div id="modal2FA" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.9); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 320px; text-align: center; position: relative;">
+            <span onclick="tutupModal2FA()" style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
+            
+            <h3 style="margin-top: 5px;">Scan QR Code</h3>
+            <p style="font-size: 12px; color: #8b949e; margin-bottom: 15px;">Gunakan aplikasi Authy atau Google Authenticator.</p>
+            
+            <div style="background: white; padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 15px;">
+                <span id="loadingQR" style="color: black; font-weight: bold;">Memuat QR...</span>
+                <img id="qrCodeImg" src="" style="display: none; width: 200px; height: 200px;" alt="QR 2FA">
+            </div>
+
+            <input type="hidden" id="tempSecret">
+            <input type="text" id="otpInput" placeholder="Masukkan 6 Digit OTP" style="width: 100%; background: #0d1117; border: 1px solid #333; color: white; padding: 12px; margin-bottom: 15px; border-radius: 5px; text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold;" maxlength="6">
+            
+            <button style="background: #39FF14; color: black; padding: 12px 20px; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%;" onclick="verifikasiSetup2FA()">Verifikasi & Aktifkan</button>
         </div>
     </div>
 
     <div class="main-wrapper">
         <div class="container">
             <h2 style="margin-bottom: 25px; text-align: center; color: #39FF14;">Update Status Paket</h2>
-            
+
             <label>Nomor Resi</label>
             <input type="text" id="inputResi" class="form-input" placeholder="Contoh: TRX-26-XXXXX">
 
@@ -72,33 +166,63 @@
 
     <script>
         // 1. TANGKAP DATA DARI URL & INISIALISASI NAVBAR
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Cek token dari URL (untuk SSO) atau SessionStorage (untuk Manual)
             const urlParams = new URLSearchParams(window.location.search);
             const tokenUrl = urlParams.get('token');
-            const roleUrl = urlParams.get('role');
-            const usernameUrl = urlParams.get('username');
-
             if (tokenUrl) {
-                localStorage.setItem('token_akses', tokenUrl);
-                localStorage.setItem('user_role', roleUrl);
-                localStorage.setItem('username', decodeURIComponent(usernameUrl));
+                sessionStorage.setItem('token_akses', tokenUrl);
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            const role = localStorage.getItem('user_role') || 'Unknown';
-            const username = localStorage.getItem('username') || 'Pengguna';
-            document.getElementById('roleTitle').innerText = role;
-            document.getElementById('displayUsername').innerText = username;
-            document.getElementById('displayEkspedisi').innerText = "Divisi Operasional & Kurir";
-        });
+            const token = sessionStorage.getItem('token_akses');
+            if (!token) { window.location.href = 'index.html'; return; }
 
+            // 2. SATU PINTU: Ambil data profil dari endpoint /me
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Tampilkan ke UI secara dinamis
+                    document.getElementById('roleTitle').innerText = data.role;
+                    document.getElementById('displayUsername').innerText = data.username;
+
+                    // Tampilan Jasa Logistik (Khusus Kurir akan otomatis muncul nama perusahaannya)
+                    const displayEkspedisi = document.getElementById('displayEkspedisi');
+                    if (data.role === 'Supplier') {
+                        displayEkspedisi.innerText = "Mitra Bisnis Utama";
+                    } else {
+                        displayEkspedisi.innerText = data.jasa_logistik || "Divisi Operasional";
+                    }
+
+                    // Simpan ID pengguna untuk keperluan form (misal: id_supplier)
+                    window.currentUserId = data.id_pengguna;
+                    const btn2FA = document.getElementById('btnToggle2FA');
+                    if (btn2FA && data.is_2fa_active) {
+                        btn2FA.innerText = "🛡️ Matikan 2FA (TOTP)";
+                        btn2FA.style.color = "#ff4444"; // Ubah jadi warna merah bata
+                        btn2FA.style.borderColor = "#ff4444";
+                        btn2FA.onclick = prosesMatikan2FA; // Alihkan fungsi kliknya
+                    }
+                } else {
+                    sessionStorage.clear();
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                console.error("Gagal sinkronisasi sesi.");
+            }
+        });
         // 2. FUNGSI UPDATE STATUS KE BACKEND
         async function updateStatusKeServer() {
             const resi = document.getElementById('inputResi').value;
             const lokasi = document.getElementById('inputLokasi').value;
             const status = document.getElementById('inputStatus').value;
             const btn = document.getElementById('btnUpdate');
-            const token = localStorage.getItem('token_akses');
+            const token = sessionStorage.getItem('token_akses');
 
             if (!token) { alert("Anda belum login!"); window.location.href = "index.html"; return; }
             if (!resi || !lokasi) { alert("Harap isi Nomor Resi dan Lokasi dengan benar!"); return; }
@@ -130,7 +254,7 @@
                     document.getElementById('inputResi').value = '';
                     document.getElementById('inputLokasi').value = '';
                 } else {
-                    alert("❌ Ditolak: " + data.detail); 
+                    alert("❌ Ditolak: " + data.detail);
                 }
             } catch (err) {
                 alert("Gagal menghubungi server database.");
@@ -142,8 +266,97 @@
         // 3. FUNGSI MODAL & LOGOUT
         function bukaSettingModal() { document.getElementById('modalSetting').style.display = 'flex'; }
         function tutupSettingModal() { document.getElementById('modalSetting').style.display = 'none'; }
-        function prosesLogout() { localStorage.clear(); window.location.href = 'index.html'; }
-        function bukaMenu2FA() { alert("Fitur 2FA dapat diatur melalui dashboard utama."); }
+        function prosesLogout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        async function prosesMatikan2FA() {
+            tutupSettingModal();
+            // Menggunakan prompt bawaan browser untuk input cepat & efisien
+            const otpCode = prompt("⚠️ Untuk MENONAKTIFKAN 2FA, masukkan 6 digit kode dari Authy / Google Authenticator Anda saat ini:");
+
+            if (otpCode === null) return; // User menekan tombol Cancel
+            if (otpCode.length !== 6) {
+                alert("Format kode tidak valid! Harus 6 angka.");
+                return;
+            }
+
+            const token = sessionStorage.getItem('token_akses');
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/disable', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ kode_otp: otpCode })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert("✅ " + result.pesan);
+                    window.location.reload(); // Refresh halaman untuk mereset tombol jadi hijau lagi
+                } else {
+                    alert("❌ Gagal: " + result.detail);
+                }
+            } catch (err) {
+                alert("Server error saat mencoba mematikan 2FA.");
+            }
+        }
+        async function bukaMenu2FA() {
+            tutupSettingModal(); 
+            document.getElementById('modal2FA').style.display = 'flex';
+            document.getElementById('loadingQR').style.display = 'block';
+            document.getElementById('qrCodeImg').style.display = 'none';
+
+            const token = localStorage.getItem('token_akses');
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/generate', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('tempSecret').value = data.secret_key;
+                    document.getElementById('qrCodeImg').src = data.qr_code_url;
+                    
+                    document.getElementById('qrCodeImg').onload = () => {
+                        document.getElementById('loadingQR').style.display = 'none';
+                        document.getElementById('qrCodeImg').style.display = 'block';
+                    };
+                } else {
+                    alert("Gagal memuat 2FA: " + data.detail);
+                }
+            } catch (err) { alert("Server tidak merespon."); }
+        }
+
+        function tutupModal2FA() { document.getElementById('modal2FA').style.display = 'none'; }
+
+        async function verifikasiSetup2FA() {
+            const token = localStorage.getItem('token_akses');
+            const secret = document.getElementById('tempSecret').value;
+            const otpCode = document.getElementById('otpInput').value;
+
+            if (otpCode.length !== 6) { alert("Masukkan 6 digit angka OTP!"); return; }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/verify-setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ secret: secret, kode_otp: otpCode })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert("✅ " + data.pesan);
+                    tutupModal2FA();
+                    window.location.reload(); // Refresh layar agar tombol berubah jadi "Matikan 2FA"
+                } else {
+                    alert("❌ Gagal: " + data.detail);
+                }
+            } catch (err) { alert("Gagal verifikasi."); }
+        }
     </script>
 </body>
+
 </html>

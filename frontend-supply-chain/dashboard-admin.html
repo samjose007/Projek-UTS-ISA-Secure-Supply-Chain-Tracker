@@ -1,53 +1,137 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Dashboard Admin - Audit Logistik</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0d1117; color: white; font-family: 'Poppins', sans-serif; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 20px; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .card { background: #161b22; padding: 20px; border-radius: 10px; border-left: 4px solid #39FF14; }
-        table { width: 100%; margin-top: 30px; border-collapse: collapse; background: #161b22; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
-        th { background: #39FF14; color: #0d1117; }
-        .btn { background: #39FF14; color: black; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        body {
+            background-color: #0d1117;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #39FF14;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: #161b22;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #39FF14;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            background: #161b22;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            background: #39FF14;
+            color: #0d1117;
+        }
+
+        .btn {
+            background: #39FF14;
+            color: black;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
-    <div class="header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 15px; margin-bottom: 30px;">
+    <div class="header"
+        style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #39FF14; padding-bottom: 15px; margin-bottom: 30px;">
         <h1 style="margin: 0; font-size: 24px;">Portal <span style="color: #39FF14;" id="roleTitle">...</span></h1>
-        
+
         <div style="display: flex; align-items: center; gap: 15px;">
             <div style="text-align: right; line-height: 1.2;">
                 <div id="displayUsername" style="font-weight: bold; font-size: 16px;">Loading...</div>
                 <div id="displayEkspedisi" style="font-size: 12px; color: #8b949e;">Loading...</div>
             </div>
-            
-            <button onclick="bukaSettingModal()" style="background: transparent; border: none; color: #39FF14; cursor: pointer;">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+
+            <button onclick="bukaSettingModal()"
+                style="background: transparent; border: none; color: #39FF14; cursor: pointer;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
             </button>
         </div>
     </div>
 
-    <div id="modalSetting" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.8); z-index: 999; justify-content: center; align-items: center;">
-        <div style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 300px; text-align: center; position: relative;">
-            <span onclick="tutupSettingModal()" style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
+    <div id="modalSetting"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.8); z-index: 999; justify-content: center; align-items: center;">
+        <div
+            style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 300px; text-align: center; position: relative;">
+            <span onclick="tutupSettingModal()"
+                style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
             <h3>Pengaturan Akun</h3>
-            <button onclick="bukaMenu2FA()" style="width: 100%; padding: 10px; margin-top: 15px; background: transparent; border: 1px solid #39FF14; color: #39FF14; border-radius: 5px; cursor: pointer;">🛡️ Aktifkan 2FA (TOTP)</button>
-            <button onclick="prosesLogout()" style="width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid #ff4444; color: #ff4444; border-radius: 5px; cursor: pointer;">🚪 Keluar (Logout)</button>
+            <button id="btnToggle2FA" onclick="bukaMenu2FA()"
+                style="width: 100%; padding: 10px; margin-top: 15px; background: transparent; border: 1px solid #39FF14; color: #39FF14; border-radius: 5px; cursor: pointer;">🛡️
+                Aktifkan 2FA (TOTP)</button>
+            <button onclick="prosesLogout()"
+                style="width: 100%; padding: 10px; margin-top: 10px; background: transparent; border: 1px solid #ff4444; color: #ff4444; border-radius: 5px; cursor: pointer;">🚪
+                Keluar (Logout)</button>
         </div>
     </div>
-    
+    <div id="modal2FA" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.9); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 320px; text-align: center; position: relative;">
+            <span onclick="tutupModal2FA()" style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
+            
+            <h3 style="margin-top: 5px;">Scan QR Code</h3>
+            <p style="font-size: 12px; color: #8b949e; margin-bottom: 15px;">Gunakan aplikasi Authy atau Google Authenticator.</p>
+            
+            <div style="background: white; padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 15px;">
+                <span id="loadingQR" style="color: black; font-weight: bold;">Memuat QR...</span>
+                <img id="qrCodeImg" src="" style="display: none; width: 200px; height: 200px;" alt="QR 2FA">
+            </div>
+
+            <input type="hidden" id="tempSecret">
+            <input type="text" id="otpInput" placeholder="Masukkan 6 Digit OTP" style="width: 100%; background: #0d1117; border: 1px solid #333; color: white; padding: 12px; margin-bottom: 15px; border-radius: 5px; text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold;" maxlength="6">
+            
+            <button style="background: #39FF14; color: black; padding: 12px 20px; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%;" onclick="verifikasiSetup2FA()">Verifikasi & Aktifkan</button>
+        </div>
+    </div>
+
     <div class="grid">
         <div class="card">
             <h3>Peringatan Integritas Data</h3>
-            <h2 style="color: #39FF14;">0 Modifikasi Ilegal</h2>
+            <h2 id="integritasCount" style="color: #39FF14;">Memindai Hash...</h2>
         </div>
         <div class="card">
-            <h3>Sistem Aktif</h3>
-            <h2 style="color: #39FF14;">SHA-256 Hashing</h2>
+            <h3>Total Pengiriman Diawasi</h3>
+            <h2 id="totalResiCount" style="color: #39FF14;">Menghitung...</h2>
         </div>
     </div>
 
@@ -62,98 +146,312 @@
             </tr>
         </thead>
         <tbody id="bodyTabel">
-            </tbody>
+        </tbody>
     </table>
 
     <script>
-        async function verifikasiLog(idPengiriman) {
-            const token = localStorage.getItem('token_akses');
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Cek token dari URL (untuk SSO) atau SessionStorage (untuk Manual)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenUrl = urlParams.get('token');
+            if (tokenUrl) {
+                sessionStorage.setItem('token_akses', tokenUrl);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            const token = sessionStorage.getItem('token_akses');
+            if (!token) { window.location.href = 'index.html'; return; }
+
+            // 2. SATU PINTU: Ambil data profil dari endpoint /me
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Tampilkan ke UI secara dinamis
+                    document.getElementById('roleTitle').innerText = data.role;
+                    document.getElementById('displayUsername').innerText = data.username;
+
+                    // Tampilan Jasa Logistik (Khusus Kurir akan otomatis muncul nama perusahaannya)
+                    const displayEkspedisi = document.getElementById('displayEkspedisi');
+                    if (data.role === 'Supplier') {
+                        displayEkspedisi.innerText = "Mitra Bisnis Utama";
+                    } else {
+                        displayEkspedisi.innerText = data.jasa_logistik || "Divisi Operasional";
+                    }
+
+                    // Simpan ID pengguna untuk keperluan form (misal: id_supplier)
+                    window.currentUserId = data.id_pengguna;
+                    muatDataDariDatabase(token);
+                    const btn2FA = document.getElementById('btnToggle2FA');
+                    if (btn2FA && data.is_2fa_active) {
+                        btn2FA.innerText = "🛡️ Matikan 2FA (TOTP)";
+                        btn2FA.style.color = "#ff4444"; // Ubah jadi warna merah bata
+                        btn2FA.style.borderColor = "#ff4444";
+                        btn2FA.onclick = prosesMatikan2FA; // Alihkan fungsi kliknya
+                    }
+                } else {
+                    sessionStorage.clear();
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                console.error("Gagal sinkronisasi sesi.");
+            }
+        });
+
+        async function muatDataDariDatabase(token) {
+            const tbody = document.getElementById('bodyTabel');
+            const integritasCountEl = document.getElementById('integritasCount');
+            let modifikasiIlegal = 0;
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/pelacakan/all', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error("Akses ditolak");
+
+                const dataPengiriman = await response.json();
+                tbody.innerHTML = '';
+                document.getElementById('totalResiCount').innerText = `${dataPengiriman.length} Resi Aktif`;
+
+                for (const item of dataPengiriman) {
+                    let isRusak = false;
+
+                    // 1. Verifikasi Integritas Dulu Sebelum Membuat Baris HTML
+                    try {
+                        const resVerifikasi = await fetch(`http://127.0.0.1:8000/pelacakan/verifikasi/${item.id_pengiriman}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+
+                        if (resVerifikasi.ok) {
+                            const dataVerifikasi = await resVerifikasi.json();
+                            if (dataVerifikasi.integritas !== "AMAN") {
+                                isRusak = true;
+                                modifikasiIlegal++;
+                            }
+                        } else if (resVerifikasi.status !== 404) {
+                            // Error selain 404 (Belum ada log) dianggap rusak
+                            isRusak = true;
+                            modifikasiIlegal++;
+                        }
+                    } catch (err) {
+                        isRusak = true;
+                        modifikasiIlegal++;
+                    }
+
+                    // 2. Tentukan Warna Teks Berdasarkan Status Kerusakan
+                    // Jika isRusak true, pakai merah (#ff4444). Jika aman, pakai warna normal.
+                    const warnaResi = isRusak ? "#ff4444" : "white";
+                    const warnaTeks = isRusak ? "#ff4444" : "white"; // Untuk Supplier
+                    const warnaStatus = isRusak ? "#ff4444" : "#39FF14"; // Hijau Neon jika aman
+
+                    // 3. Render HTML dengan Variabel Warna
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: bold; color: ${warnaResi};">${item.nomor_resi}</td>
+                        <td style="color: ${warnaTeks};">${item.supplier}</td>
+                        <td style="font-weight: bold; color: ${warnaStatus};">${item.status_pengiriman}</td>
+                        <td>
+                            <button style="background: #161b22; border: 1px solid #39FF14; color: #39FF14; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px;" onclick="cekIntegritas(${item.id_pengiriman})">🔍 Cek Hash</button>
+                            <button style="background: #39FF14; border:none; color: #000; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold;" onclick="cetakPDF(${item.id_pengiriman}, '${item.nomor_resi}', '${item.supplier}', '${item.status_pengiriman}')">📄 PDF</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+
+                // Update tampilan Peringatan Integritas Data di atas tabel
+                if (modifikasiIlegal > 0) {
+                    integritasCountEl.innerText = `${modifikasiIlegal} Modifikasi Ilegal Ditemukan!`;
+                    integritasCountEl.style.color = "#ff4444";
+                } else {
+                    integritasCountEl.innerText = "0 Modifikasi Ilegal (Aman)";
+                    integritasCountEl.style.color = "#39FF14";
+                }
+
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #ff4444;">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        async function cekIntegritas(idPengiriman) {
+            const token = sessionStorage.getItem('token_akses');
             try {
                 const response = await fetch(`http://127.0.0.1:8000/pelacakan/verifikasi/${idPengiriman}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const data = await response.json();
-                alert(`Status Integritas: ${data.integritas}\nPesan: ${data.pesan}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.integritas === "AMAN") {
+                        alert(`✅ STATUS: ${data.integritas}\n\n${data.pesan}`);
+                    } else {
+                        alert(`🚨 PERINGATAN: ${data.integritas}!\n\n${data.pesan}`);
+                    }
+                } else if (response.status === 404) {
+                    alert(`ℹ️ INFO: Belum ada log pelacakan untuk resi ini (Barang belum dijemput Kurir).`);
+                } else {
+                    alert(`🚨 Gagal mengecek integritas data.`);
+                }
             } catch (err) {
-                alert('Gagal menghubungi node verifikasi.');
+                alert('Gagal menghubungi node blockchain untuk verifikasi.');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const role = localStorage.getItem('user_role') || 'Unknown';
-            const username = localStorage.getItem('username') || 'Pengguna';
-            
-            document.getElementById('roleTitle').innerText = role;
-            document.getElementById('displayUsername').innerText = username;
-            
-            // Logika untuk Kurir/Admin yang punya jasa ekspedisi
-            if(role === 'Kurir' || role === 'Admin') {
-                // Di sistem aslinya, ambil dari API fetch("/me"). Untuk sementara jika belum ada di API:
-                document.getElementById('displayEkspedisi').innerText = "Divisi Operasional";
-            } else {
-                document.getElementById('displayEkspedisi').innerText = "Mitra Bisnis";
+        // Fungsi cetak diubah menjadi async agar bisa mengambil data hash realtime
+        async function cetakPDF(idPengiriman, resi, supplier, status) {
+            const token = sessionStorage.getItem('token_akses');
+            let statusIntegritas = "BELUM ADA LOG";
+            let badgeColor = "orange"; // Warna default jika belum dijemput
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/pelacakan/verifikasi/${idPengiriman}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.integritas === "AMAN") {
+                        statusIntegritas = "VALID / AMAN";
+                        badgeColor = "green";
+                    } else {
+                        statusIntegritas = "RUSAK / TERMODIFIKASI";
+                        badgeColor = "red";
+                    }
+                } else if (response.status === 404) {
+                    statusIntegritas = "BELUM ADA LOG (Menunggu Kurir)";
+                    badgeColor = "orange";
+                }
+            } catch (err) {
+                statusIntegritas = "ERROR KONEKSI DATABASE";
+                badgeColor = "red";
             }
-        });
 
-        document.addEventListener('DOMContentLoaded', muatDataDariDatabase);
-
-        async function muatDataDariDatabase() {
-            const tbody = document.getElementById('bodyTabel');
-            
-            // CONTOH FETCH KE BACKEND (Endpoint harus dibuat di backend)
-            // const token = localStorage.getItem('token_akses');
-            // const response = await fetch('http://127.0.0.1:8000/pengiriman/all', { headers: {'Authorization': `Bearer ${token}`} });
-            // const dataPengiriman = await response.json();
-            
-            // SIMULASI RESPONSE DATABASE AGAR UI BISA BERJALAN DULU
-            const dataPengiriman = [
-                { id_pengiriman: 1, no_resi: "TRX-A891", supplier: "PT Indo Jaya", status: "Paket Berhasil Dikirim" },
-                { id_pengiriman: 2, no_resi: "TRX-B223", supplier: "CV Maju Terus", status: "Tiba di Hub Transit" }
-            ];
-
-            tbody.innerHTML = ''; // Kosongkan tabel dulu
-            
-            dataPengiriman.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight: bold; color: white;">${item.no_resi}</td>
-                    <td>${item.supplier}</td>
-                    <td style="color: #39FF14;">${item.status}</td>
-                    <td>
-                        <button style="background: #161b22; border: 1px solid #39FF14; color: #39FF14; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-right: 5px;" onclick="cekIntegritas(${item.id_pengiriman})">🔍 Cek Hash</button>
-                        <button style="background: #39FF14; border:none; color: #000; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold;" onclick="cetakPDF('${item.no_resi}', '${item.supplier}', '${item.status}')">📄 PDF</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function cekIntegritas(id) {
-            // Fungsi panggil endpoint /pelacakan/verifikasi/{id} yang sudah ada di routes/pelacakan.py
-            alert("Memeriksa integritas SHA-256 untuk ID Pengiriman: " + id);
-        }
-
-        function cetakPDF(resi, supplier, status) {
-            // Membuka window baru khusus format cetak, mengambil data spesifik baris tersebut
-            const printWindow = window.open('', '', 'height=600,width=800');
-            printWindow.document.write('<html><head><title>Cetak Laporan - ' + resi + '</title>');
-            printWindow.document.write('<style>body{font-family: sans-serif; padding: 20px;} th, td{text-align: left; padding: 10px; border-bottom: 1px solid #ddd;}</style></head><body>');
-            printWindow.document.write('<h2>Sertifikat Integritas Rantai Pasok</h2>');
-            printWindow.document.write('<p><strong>Sistem Pendeteksi:</strong> Algoritma SHA-256 (Blockchain-like)</p><hr>');
-            printWindow.document.write('<table>');
-            printWindow.document.write(`<tr><th>Nomor Resi</th><td>${resi}</td></tr>`);
-            printWindow.document.write(`<tr><th>Pengirim / Supplier</th><td>${supplier}</td></tr>`);
-            printWindow.document.write(`<tr><th>Status Akhir Terverifikasi</th><td>${status}</td></tr>`);
-            printWindow.document.write(`<tr><th>Hasil Verifikasi Audit</th><td><strong>VALID</strong> (Tidak ada manipulasi data)</td></tr>`);
-            printWindow.document.write('</table><br><br><p>Dicetak secara otomatis oleh sistem Secure Supply Chain Tracker.</p>');
-            printWindow.document.write('</body></html>');
+            const printWindow = window.open('', '', 'height=700,width=900');
+            printWindow.document.write(`
+                <title>Sertifikat Integritas - ${resi}</title>
+                <style>
+                    body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; }
+                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { text-align: left; padding: 12px; border: 1px solid #ddd; }
+                    th { background-color: #f4f4f4; width: 40%; }
+                    .badge { color: ${badgeColor}; font-weight: bold; border: 1px solid ${badgeColor}; padding: 5px 10px; border-radius: 5px; display: inline-block;}
+                </style>
+                <div class="header">
+                    <h2>Laporan Audit Integritas Rantai Pasok</h2>
+                    <p>Sistem Pelacakan Logistik Terpadu (SHA-256 Verified)</p>
+                </div>
+                <table>
+                    <tr><th>Nomor Resi</th><td><strong>${resi}</strong></td></tr>
+                    <tr><th>Pengirim / Supplier</th><td>${supplier}</td></tr>
+                    <tr><th>Status Terkini</th><td>${status}</td></tr>
+                    <tr><th>Hasil Analisis Hash Log</th><td><span class="badge">${statusIntegritas}</span></td></tr>
+                </table>
+                <br><br><br>
+                <p style="font-size: 12px; color: #777;">Dokumen ini digenerate secara otomatis oleh sistem Secure Supply Chain Tracker dan menjamin bahwa riwayat log tidak mengalami modifikasi ilegal di level database.</p>
+            `);
             printWindow.document.close();
-            printWindow.print();
+
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
         }
 
         function bukaSettingModal() { document.getElementById('modalSetting').style.display = 'flex'; }
         function tutupSettingModal() { document.getElementById('modalSetting').style.display = 'none'; }
-        function prosesLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function prosesLogout() { sessionStorage.clear(); window.location.href = 'index.html'; }
+        async function prosesMatikan2FA() {
+            tutupSettingModal();
+            // Menggunakan prompt bawaan browser untuk input cepat & efisien
+            const otpCode = prompt("⚠️ Untuk MENONAKTIFKAN 2FA, masukkan 6 digit kode dari Authy / Google Authenticator Anda saat ini:");
+            
+            if (otpCode === null) return; // User menekan tombol Cancel
+            if (otpCode.length !== 6) {
+                alert("Format kode tidak valid! Harus 6 angka.");
+                return;
+            }
+
+            const token = sessionStorage.getItem('token_akses');
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/disable', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ kode_otp: otpCode })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert("✅ " + result.pesan);
+                    window.location.reload(); // Refresh halaman untuk mereset tombol jadi hijau lagi
+                } else {
+                    alert("❌ Gagal: " + result.detail);
+                }
+            } catch (err) {
+                alert("Server error saat mencoba mematikan 2FA.");
+            }
+        }
+        async function bukaMenu2FA() {
+            tutupSettingModal(); 
+            document.getElementById('modal2FA').style.display = 'flex';
+            document.getElementById('loadingQR').style.display = 'block';
+            document.getElementById('qrCodeImg').style.display = 'none';
+
+            const token = localStorage.getItem('token_akses');
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/generate', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('tempSecret').value = data.secret_key;
+                    document.getElementById('qrCodeImg').src = data.qr_code_url;
+                    
+                    document.getElementById('qrCodeImg').onload = () => {
+                        document.getElementById('loadingQR').style.display = 'none';
+                        document.getElementById('qrCodeImg').style.display = 'block';
+                    };
+                } else {
+                    alert("Gagal memuat 2FA: " + data.detail);
+                }
+            } catch (err) { alert("Server tidak merespon."); }
+        }
+        function tutupModal2FA() { document.getElementById('modal2FA').style.display = 'none'; }
+        async function verifikasiSetup2FA() {
+            const token = localStorage.getItem('token_akses');
+            const secret = document.getElementById('tempSecret').value;
+            const otpCode = document.getElementById('otpInput').value;
+
+            if (otpCode.length !== 6) { alert("Masukkan 6 digit angka OTP!"); return; }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/verify-setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ secret: secret, kode_otp: otpCode })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert("✅ " + data.pesan);
+                    tutupModal2FA();
+                    window.location.reload(); // Refresh layar agar tombol berubah jadi "Matikan 2FA"
+                } else {
+                    alert("❌ Gagal: " + data.detail);
+                }
+            } catch (err) { alert("Gagal verifikasi."); }
+        }
     </script>
 </body>
+
 </html>

@@ -24,7 +24,12 @@ else:
     args_koneksi = {} # Untuk localhost / XAMPP biasa yang tidak butuh SSL
 
 # Buat engine dengan parameter yang sudah disesuaikan
-engine = create_engine(clean_url, connect_args=args_koneksi)
+engine = create_engine(
+    clean_url, 
+    connect_args=args_koneksi,
+    pool_pre_ping=True,   # Memaksa SQLAlchemy mengecek koneksi mati/hidup sebelum query
+    pool_recycle=300      # Memaksa SQLAlchemy membuat ulang koneksi setiap 5 menit (300 detik)
+)
 Sessionlocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

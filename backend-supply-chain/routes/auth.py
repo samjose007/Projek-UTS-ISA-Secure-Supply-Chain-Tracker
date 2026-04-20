@@ -12,8 +12,99 @@ from security.rbac import SECRET_KEY, ALGORITHM
 from pydantic import BaseModel
 from typing import Optional
 import urllib.parse
+from passlib.context import CryptContext
+from pydantic import EmailStr
 
 router = APIRouter(prefix="/auth", tags=["Autentikasi & Keamanan"])
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Schema untuk pendaftaran & login manual
+class RegisterManual(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    role: str
+    jasa_logistik: Optional[str] = None
+
+class LoginManual(BaseModel):
+    identifier: str # Bisa Username atau Email
+    password: str
+
+# --- 1. ENDPOINT REGISTER MANUAL ---
+@router.post("/register")
+def register_manual(data: RegisterManual, db: Session = Depends(get_db)):
+    existing_user = db.query(Pengguna).filter(
+        (Pengguna.username == data.username) | (Pengguna.email == data.email)
+    ).first()
+    
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username atau Email sudah terdaftar!")
+
+    # Hash password (Keamanan Data: Integrity & Confidentiality)
+    hashed_password = pwd_context.hash(data.password)
+
+    user_baru = Pengguna(
+        username=data.username,
+        email=data.email,
+        password_hash=hashed_password,
+        role=data.role,
+        jasa_logistik=data.jasa_logistik
+    )
+    db.add(user_baru)
+    db.commit()
+    return {"status": "sukses", "pesan": "Akun berhasil dibuat!"}
+
+# --- 2. ENDPOINT LOGIN MANUAL ---
+@router.post("/login-manual")
+def login_manual(data: LoginManual, db: Session = Depends(get_db)):
+    user = db.query(Pengguna).filter(
+        (Pengguna.username == data.identifier) | (Pengguna.email == data.identifier)
+    ).first()
+
+    if not user or not pwd_context.verify(data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="ID atau Password Salah!")
+
+    if user.totp_secret:
+        temp_data = {"sub": str(user.id_pengguna), "type": "temp_2fa"}
+        temp_token = jwt.encode(temp_data, SECRET_KEY, algorithm=ALGORITHM)
+        return {"require_2fa": True, "temp_token": temp_token}
+
+    token_data = {"role": user.role, "sub": str(user.id_pengguna)}
+    access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+    
+    return {
+        "require_2fa": False,
+        "access_token": access_token,
+        "role": user.role,
+        "username": user.username
+    }
+
+# --- 3. ENDPOINT UNIFIED PROFILE (/me) ---
+@router.get("/me")
+def get_current_user_info(request: Request, db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        raise HTTPException(status_code=401, detail="Sesi tidak valid")
+    
+    try:
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+        
+        user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User tidak ditemukan")
+            
+        return {
+            "username": user.username,
+            "role": user.role,
+            "jasa_logistik": user.jasa_logistik,
+            "id_pengguna": user.id_pengguna,
+            "is_2fa_active": bool(user.totp_secret)
+        }
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token kedaluwarsa")
 
 # --- SETUP OAUTH GOOGLE ---
 config = Config(".env")
@@ -140,6 +231,36 @@ def selesaikan_pendaftaran(data: FinalisasiRegister, request: Request, db: Sessi
 class VerifySetup(BaseModel):
     secret: str
     kode_otp: str
+@router.post("/2fa/verify-setup")
+def verify_setup_2fa(data: VerifySetup, request: Request, db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        raise HTTPException(status_code=401, detail="Sesi tidak valid")
+    
+    try:
+        # 1. Dekode Token untuk tahu siapa yang sedang login
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+        
+        user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User tidak ditemukan")
+
+        # 2. Verifikasi OTP dari aplikasi Authenticator dengan secret sementara
+        import pyotp
+        totp = pyotp.TOTP(data.secret)
+        
+        if totp.verify(data.kode_otp):
+            # 3. JIKA BERHASIL: Simpan secret secara permanen ke database
+            user.totp_secret = data.secret
+            db.commit()
+            return {"status": "sukses", "pesan": "Fitur 2FA berhasil diaktifkan kembali!"}
+        else:
+            raise HTTPException(status_code=400, detail="Kode OTP Salah atau sudah Kadaluwarsa!")
+            
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Autentikasi gagal atau sesi kedaluwarsa.")
 
 @router.get("/2fa/generate")
 def generate_2fa_secret(request: Request, db: Session = Depends(get_db)):
@@ -197,3 +318,33 @@ def verify_login_2fa(data: VerifyLogin2FA, db: Session = Depends(get_db)):
             raise HTTPException(status_code=401, detail="Kode OTP Salah atau Expired!")
     except Exception as e:
         raise HTTPException(status_code=401, detail="Sesi login kedaluwarsa, silakan login ulang.")
+
+class Disable2FA(BaseModel):
+    kode_otp: str
+
+@router.post("/2fa/disable")
+def disable_2fa(data: Disable2FA, request: Request, db: Session = Depends(get_db)):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        raise HTTPException(status_code=401, detail="Sesi tidak valid")
+    
+    token = auth_header.split(" ")[1]
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    user_id = int(payload.get("sub"))
+    
+    user = db.query(Pengguna).filter(Pengguna.id_pengguna == user_id).first()
+    
+    if not user.totp_secret:
+        raise HTTPException(status_code=400, detail="2FA belum aktif!")
+        
+    # Verifikasi OTP yang dimasukkan sebelum menghapus rahasia
+    import pyotp
+    totp = pyotp.TOTP(user.totp_secret)
+    
+    if totp.verify(data.kode_otp):
+        user.totp_secret = None # Hapus kunci 2FA dari database
+        db.commit()
+        return {"status": "sukses", "pesan": "Fitur 2FA berhasil dinonaktifkan."}
+    else:
+        raise HTTPException(status_code=401, detail="Kode OTP Salah atau Kadaluwarsa!")
+

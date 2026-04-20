@@ -3,7 +3,11 @@ import json
 from datetime import datetime 
 
 def generate_hash(id_log: int, aksi_pelacakan: str, waktu_log: datetime, hash_sebelumnya: str) -> str:
-    data_string = f"{id_log}-{aksi_pelacakan}-{waktu_log}-{hash_sebelumnya}"
+    # FORMAT WAKTU: Buang milidetik agar konsisten saat keluar-masuk database
+    waktu_string = waktu_log.strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Gunakan waktu_string yang sudah diformat
+    data_string = f"{id_log}-{aksi_pelacakan}-{waktu_string}-{hash_sebelumnya}"
     hash_object = hashlib.sha256(data_string.encode('utf-8'))
     return hash_object.hexdigest()
 
@@ -12,7 +16,6 @@ def verify_chain(logs: list) -> bool:
         current_log = logs[i]
         previous_log = logs[i-1]
 
-        # Disesuaikan dengan nama kolom di tabel log_pelacakan
         if current_log.hash_sebelumnya != previous_log.hash_sekarang:
             return False
         

@@ -111,7 +111,7 @@
             <span onclick="tutupSettingModal()"
                 style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
             <h3>Pengaturan Akun</h3>
-            <button onclick="bukaMenu2FA()"
+            <button id="btnToggle2FA" onclick="bukaMenu2FA()"
                 style="width: 100%; padding: 10px; margin-top: 15px; background: transparent; border: 1px solid #39FF14; color: #39FF14; border-radius: 5px; cursor: pointer;">🛡️
                 Aktifkan 2FA (TOTP)</button>
             <button onclick="prosesLogout()"
@@ -119,21 +119,27 @@
                 Keluar (Logout)</button>
         </div>
     </div>
-    <div id="modal2FA" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.9); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 320px; text-align: center; position: relative;">
-            <span onclick="tutupModal2FA()" style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
-            
+    <div id="modal2FA"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.9); z-index: 1000; justify-content: center; align-items: center;">
+        <div
+            style="background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #39FF14; width: 320px; text-align: center; position: relative;">
+            <span onclick="tutupModal2FA()"
+                style="position: absolute; right: 15px; top: 10px; font-size: 20px; cursor: pointer; color: #8b949e;">&times;</span>
+
             <h3 style="margin-top: 5px;">Scan QR Code</h3>
-            <p style="font-size: 12px; color: #8b949e; margin-bottom: 15px;">Gunakan aplikasi Authy atau Google Authenticator.</p>
-            
-            <div style="background: white; padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 15px;">
+            <p style="font-size: 12px; color: #8b949e; margin-bottom: 15px;">Gunakan aplikasi Authy atau Google
+                Authenticator.</p>
+
+            <div
+                style="background: white; padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 15px;">
                 <span id="loadingQR" style="color: black; font-weight: bold;">Memuat QR...</span>
                 <img id="qrCodeImg" src="" style="display: none; width: 200px; height: 200px;" alt="QR 2FA">
             </div>
 
             <input type="hidden" id="tempSecret">
-            <input type="text" id="otpInput" class="form-input" placeholder="Masukkan 6 Digit OTP" style="text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold;" maxlength="6">
-            
+            <input type="text" id="otpInput" class="form-input" placeholder="Masukkan 6 Digit OTP"
+                style="text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold;" maxlength="6">
+
             <button class="btn" style="width: 100%;" onclick="verifikasiSetup2FA()">Verifikasi & Aktifkan</button>
         </div>
     </div>
@@ -165,7 +171,8 @@
                 <option value="PastiSampai Logistik">PastiSampai Logistik</option>
             </select>
 
-            <button id="btnSubmit" class="btn" style="width: 100%; margin-top: 15px;" onclick="simpanDanBuatResi()">Kunci Data & Buat
+            <button id="btnSubmit" class="btn" style="width: 100%; margin-top: 15px;"
+                onclick="simpanDanBuatResi()">Kunci Data & Buat
                 Resi</button>
         </div>
     </div>
@@ -177,26 +184,63 @@
         const roleUrl = urlParams.get('role');
         const usernameUrl = urlParams.get('username');
 
-        // Jika ada data di URL, simpan ke LocalStorage port 5500, lalu bersihkan URL-nya biar rapi
+        // Jika ada data di URL, simpan ke sessionStorage port 5500, lalu bersihkan URL-nya biar rapi
         if (tokenUrl) {
-            localStorage.setItem('token_akses', tokenUrl);
-            localStorage.setItem('user_role', roleUrl);
-            localStorage.setItem('username', decodeURIComponent(usernameUrl));
+            sessionStorage.setItem('token_akses', tokenUrl);
+            sessionStorage.setItem('user_role', roleUrl);
+            sessionStorage.setItem('username', decodeURIComponent(usernameUrl));
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         // 2. TAMPILKAN DATA DI NAVBAR
-        document.addEventListener('DOMContentLoaded', () => {
-            const role = localStorage.getItem('user_role') || 'Unknown';
-            const username = localStorage.getItem('username') || 'Pengguna';
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Cek token dari URL (untuk SSO) atau SessionStorage (untuk Manual)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenUrl = urlParams.get('token');
+            if (tokenUrl) {
+                sessionStorage.setItem('token_akses', tokenUrl);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
 
-            document.getElementById('roleTitle').innerText = role;
-            document.getElementById('displayUsername').innerText = username;
+            const token = sessionStorage.getItem('token_akses');
+            if (!token) { window.location.href = 'index.html'; return; }
 
-            if (role === 'Kurir' || role === 'Admin') {
-                document.getElementById('displayEkspedisi').innerText = "Divisi Operasional";
-            } else {
-                document.getElementById('displayEkspedisi').innerText = "Mitra Bisnis";
+            // 2. SATU PINTU: Ambil data profil dari endpoint /me
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Tampilkan ke UI secara dinamis
+                    document.getElementById('roleTitle').innerText = data.role;
+                    document.getElementById('displayUsername').innerText = data.username;
+
+                    // Tampilan Jasa Logistik (Khusus Kurir akan otomatis muncul nama perusahaannya)
+                    const displayEkspedisi = document.getElementById('displayEkspedisi');
+                    if (data.role === 'Supplier') {
+                        displayEkspedisi.innerText = "Mitra Bisnis Utama";
+                    } else {
+                        displayEkspedisi.innerText = data.jasa_logistik || "Divisi Operasional";
+                    }
+
+                    // Simpan ID pengguna untuk keperluan form (misal: id_supplier)
+                    window.currentUserId = data.id_pengguna;
+                    const btn2FA = document.getElementById('btnToggle2FA');
+                    if (btn2FA && data.is_2fa_active) {
+                        btn2FA.innerText = "🛡️ Matikan 2FA (TOTP)";
+                        btn2FA.style.color = "#ff4444"; // Ubah jadi warna merah bata
+                        btn2FA.style.borderColor = "#ff4444";
+                        btn2FA.onclick = prosesMatikan2FA; // Alihkan fungsi kliknya
+                    }
+                } else {
+                    sessionStorage.clear();
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                console.error("Gagal sinkronisasi sesi.");
             }
         });
 
@@ -209,7 +253,7 @@
             const alamatPenerima = document.getElementById('alamatPenerima').value;
             const jasaPengiriman = document.getElementById('jasaPengiriman').value;
 
-            const token = localStorage.getItem('token_akses');
+            const token = sessionStorage.getItem('token_akses');
             if (!token) { alert('Sesi habis, silakan login ulang!'); return; }
 
             if (!namaBarang || !deskripsiBarang || !namaPenerima || !alamatPenerima) {
@@ -242,7 +286,7 @@
 
                 if (response.ok) {
                     alert(`✅ SUKSES!\n\nNomor Resi: ${data.nomor_resi}\nKurir Penjemput: ${jasaPengiriman}\n\n*Catatan Keamanan: Deskripsi barang dan Alamat tujuan telah di-enkripsi di database.`);
-                    window.location.reload(); 
+                    window.location.reload();
                 } else {
                     alert("Gagal: " + data.detail);
                     btn.innerText = "Kunci Data & Buat Resi";
@@ -256,14 +300,14 @@
         // FUNGSI MODAL
         function bukaSettingModal() { document.getElementById('modalSetting').style.display = 'flex'; }
         function tutupSettingModal() { document.getElementById('modalSetting').style.display = 'none'; }
-        function prosesLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function prosesLogout() { sessionStorage.clear(); window.location.href = 'index.html'; }
         async function bukaMenu2FA() {
             tutupSettingModal(); // Tutup modal gir
             document.getElementById('modal2FA').style.display = 'flex';
             document.getElementById('loadingQR').style.display = 'block';
             document.getElementById('qrCodeImg').style.display = 'none';
 
-            const token = localStorage.getItem('token_akses');
+            const token = sessionStorage.getItem('token_akses');
             try {
                 const response = await fetch('http://127.0.0.1:8000/auth/2fa/generate', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -273,7 +317,7 @@
                 if (response.ok) {
                     document.getElementById('tempSecret').value = data.secret_key;
                     document.getElementById('qrCodeImg').src = data.qr_code_url;
-                    
+
                     // Hilangkan tulisan loading saat gambar sudah di-load
                     document.getElementById('qrCodeImg').onload = () => {
                         document.getElementById('loadingQR').style.display = 'none';
@@ -286,9 +330,8 @@
         }
 
         function tutupModal2FA() { document.getElementById('modal2FA').style.display = 'none'; }
-
         async function verifikasiSetup2FA() {
-            const token = localStorage.getItem('token_akses');
+            const token = sessionStorage.getItem('token_akses');
             const secret = document.getElementById('tempSecret').value;
             const otpCode = document.getElementById('otpInput').value;
 
@@ -312,6 +355,40 @@
                     alert("❌ Gagal: " + data.detail);
                 }
             } catch (err) { alert("Gagal verifikasi."); }
+        }
+
+        async function prosesMatikan2FA() {
+            tutupSettingModal();
+            // Menggunakan prompt bawaan browser untuk input cepat & efisien
+            const otpCode = prompt("⚠️ Untuk MENONAKTIFKAN 2FA, masukkan 6 digit kode dari Authy / Google Authenticator Anda saat ini:");
+            
+            if (otpCode === null) return; // User menekan tombol Cancel
+            if (otpCode.length !== 6) {
+                alert("Format kode tidak valid! Harus 6 angka.");
+                return;
+            }
+
+            const token = sessionStorage.getItem('token_akses');
+            try {
+                const response = await fetch('http://127.0.0.1:8000/auth/2fa/disable', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ kode_otp: otpCode })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert("✅ " + result.pesan);
+                    window.location.reload(); // Refresh halaman untuk mereset tombol jadi hijau lagi
+                } else {
+                    alert("❌ Gagal: " + result.detail);
+                }
+            } catch (err) {
+                alert("Server error saat mencoba mematikan 2FA.");
+            }
         }
     </script>
 </body>
