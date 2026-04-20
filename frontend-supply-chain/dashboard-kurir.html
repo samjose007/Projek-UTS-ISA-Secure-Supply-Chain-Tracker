@@ -306,7 +306,7 @@
             document.getElementById('loadingQR').style.display = 'block';
             document.getElementById('qrCodeImg').style.display = 'none';
 
-            const token = localStorage.getItem('token_akses');
+            const token = sessionStorage.getItem('token_akses');
             try {
                 const response = await fetch('http://127.0.0.1:8000/auth/2fa/generate', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -330,7 +330,7 @@
         function tutupModal2FA() { document.getElementById('modal2FA').style.display = 'none'; }
 
         async function verifikasiSetup2FA() {
-            const token = localStorage.getItem('token_akses');
+            const token = sessionStorage.getItem('token_akses');
             const secret = document.getElementById('tempSecret').value;
             const otpCode = document.getElementById('otpInput').value;
 

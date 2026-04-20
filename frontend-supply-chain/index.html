@@ -99,6 +99,30 @@
             transform: scale(1.05);
         }
 
+        /* Container untuk menggabungkan ikon dan teks */
+        .auth-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            /* Jarak antara ikon dan tulisan */
+            cursor: pointer;
+            /* Mengubah kursor jadi tangan saat diarahkan */
+        }
+
+        /* Style untuk teks Login/Register */
+        .auth-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: 0.3s;
+        }
+
+        /* Efek hover: teks ikut menyala (hijau) saat area disorot mouse */
+        .auth-group:hover .auth-text {
+            color: var(--neon-green);
+        }
+
         /* CSS Tambahan untuk Social Login */
         .divider {
             display: flex;
@@ -387,8 +411,14 @@
             }
         }
 
-        .modal-content::-webkit-scrollbar { width: 6px; }
-        .modal-content::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 3px; }
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--neon-green);
+            border-radius: 3px;
+        }
     </style>
 </head>
 
@@ -405,21 +435,18 @@
             </svg>
             Domain Expired<span>Track</span>
         </a>
-        <ul class="nav-links">
-            <li><a href="#">Beranda</a></li>
-            <li><a href="#">Cek Tarif</a></li>
 
-            <li>
-                <button class="profile-btn" onclick="bukaModalAuth()" title="Login / Daftar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                </button>
-            </li>
+        <div class="auth-group" onclick="bukaModalAuth()">
+            <button class="profile-btn" title="Login / Daftar" style="pointer-events: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </button>
+            <span class="auth-text">Login/Register</span>
+        </div>
 
-        </ul>
     </nav>
 
     <div id="authModal" class="modal">
@@ -483,10 +510,12 @@
 
                 <div class="divider">Or register with:</div>
                 <button type="button" class="btn-google" onclick="loginGoogle()">
-                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google Logo" width="18">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google Logo"
+                        width="18">
                     Google
                 </button>
-                <button type="submit" id="btnSubmitDaftar" class="btn-neon" style="width: 100%; border-radius: 10px; margin-top: 10px;">Buat Akun</button>
+                <button type="submit" id="btnSubmitDaftar" class="btn-neon"
+                    style="width: 100%; border-radius: 10px; margin-top: 10px;">Buat Akun</button>
             </form>
         </div>
     </div>
@@ -611,7 +640,7 @@
         function toggleJasaRegister() {
             const role = document.getElementById('regRole').value;
             const jasaGroup = document.getElementById('regJasaGroup');
-            
+
             if (role === 'Kurir' || role === 'Admin') {
                 jasaGroup.style.display = 'block';
             } else {
@@ -660,7 +689,7 @@
             const username = form.querySelector('input[placeholder="Nama lengkap atau username"]').value;
             const email = form.querySelector('input[type="email"]').value;
             const password = form.querySelector('input[type="password"]').value;
-            
+
             // Ambil dari ID yang baru dibuat
             const role = document.getElementById('regRole').value;
             const jasa = document.getElementById('regJasa').value;
@@ -678,12 +707,12 @@
                 const response = await fetch('http://127.0.0.1:8000/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        username: username, 
-                        email: email, 
-                        password: password, 
-                        role: role, 
-                        jasa_logistik: (role === 'Kurir' || role === 'Admin') ? jasa : null 
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        role: role,
+                        jasa_logistik: (role === 'Kurir' || role === 'Admin') ? jasa : null
                     })
                 });
 
@@ -696,8 +725,8 @@
                     const err = await response.json();
                     alert("Gagal: " + err.detail);
                 }
-            } catch (err) { 
-                alert("Kesalahan koneksi ke server."); 
+            } catch (err) {
+                alert("Kesalahan koneksi ke server.");
             } finally {
                 btn.innerText = "Buat Akun";
             }
