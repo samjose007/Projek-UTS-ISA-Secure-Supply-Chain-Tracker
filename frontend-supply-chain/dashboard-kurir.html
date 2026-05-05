@@ -180,7 +180,7 @@
 
             // 2. SATU PINTU: Ambil data profil dari endpoint /me
             try {
-                const response = await fetch('http://127.0.0.1:8000/auth/me', {
+                const response = await fetch('https://projek-uts-isa-secure-supply-chain.onrender.com/auth/me', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -233,7 +233,7 @@
             btn.innerText = "Memverifikasi & Menyimpan...";
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/pelacakan/update-status', {
+                const response = await fetch('https://projek-uts-isa-secure-supply-chain.onrender.com/pelacakan/update-status', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -280,7 +280,7 @@
 
             const token = sessionStorage.getItem('token_akses');
             try {
-                const response = await fetch('http://127.0.0.1:8000/auth/2fa/disable', {
+                const response = await fetch('https://projek-uts-isa-secure-supply-chain.onrender.com/auth/2fa/disable', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -308,7 +308,7 @@
 
             const token = sessionStorage.getItem('token_akses');
             try {
-                const response = await fetch('http://127.0.0.1:8000/auth/2fa/generate', {
+                const response = await fetch('https://projek-uts-isa-secure-supply-chain.onrender.com/auth/2fa/generate', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -337,7 +337,7 @@
             if (otpCode.length !== 6) { alert("Masukkan 6 digit angka OTP!"); return; }
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/auth/2fa/verify-setup', {
+                const response = await fetch('https://projek-uts-isa-secure-supply-chain.onrender.com/auth/2fa/verify-setup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
