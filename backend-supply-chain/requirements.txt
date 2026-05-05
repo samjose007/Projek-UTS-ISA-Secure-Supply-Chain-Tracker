@@ -9,3 +9,5 @@ cryptography
 pymysql
 python-jose[cryptography]
 passlib[bcrypt] 
+pyotp 
+qrcode
