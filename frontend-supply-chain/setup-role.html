@@ -54,7 +54,7 @@
             document.getElementById('btnSubmit').innerText = "Menyimpan...";
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/auth/complete-registration', {
+                const response = await fetch('https://projek-uts-isa-secure-supply-chain.onrender.com/auth/complete-registration', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
