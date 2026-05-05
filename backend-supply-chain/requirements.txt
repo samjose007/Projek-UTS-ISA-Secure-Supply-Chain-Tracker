@@ -6,3 +6,4 @@ Authlib
 python-dotenv
 PyJWT
 cryptography 
+pymysql
