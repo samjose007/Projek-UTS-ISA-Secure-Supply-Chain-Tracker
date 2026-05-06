@@ -161,7 +161,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             return HTMLResponse(content=f"""
                 <script>
                     alert(`Autentikasi Google Berhasil! Silakan lengkapi peran dan jasa logistik Anda.`);
-                    window.location.href = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/setup-role.html';
+                    window.location.href = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/setup-role.html?token={temp_reg_token}';
                 </script>
             """)
 
