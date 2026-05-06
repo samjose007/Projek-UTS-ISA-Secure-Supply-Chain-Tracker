@@ -51,20 +51,31 @@
         async function selesaikanDaftar() {
             const role = document.getElementById('roleSelect').value;
             const jasa = role !== 'Supplier' ? document.getElementById('jasaSelect').value : null;
+
+            // NANGKEP TOKEN DARI URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            if (!token) {
+                alert("Error: Token registrasi tidak ditemukan. Silakan ulangi login Google.");
+                window.location.href = "index.html";
+                return;
+            }
+
             document.getElementById('btnSubmit').innerText = "Menyimpan...";
 
             try {
                 const response = await fetch('https://projek-uts-isa-secure-supply-chain.onrender.com/auth/complete-registration', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ role: role, jasa_logistik: jasa })
+                    // Hilangkan credentials: 'include' karena kita sudah tidak butuh kirim cookie
+                    body: JSON.stringify({ role: role, jasa_logistik: jasa, token: token }) // Masukkan token ke body
                 });
 
                 const data = await response.json();
                 if (response.ok) {
                     alert("Berhasil didaftarkan! Silakan login untuk melanjutkan.");
-                    window.location.href = "index.html"; // Kembalikan ke depan untuk login
+                    window.location.href = "index.html"; 
                 } else {
                     alert("Gagal: " + data.detail);
                     document.getElementById('btnSubmit').innerText = "Simpan & Masuk Dashboard";
