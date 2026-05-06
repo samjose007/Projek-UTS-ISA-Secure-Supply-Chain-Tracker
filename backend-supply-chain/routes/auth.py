@@ -141,7 +141,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             return HTMLResponse(content=f"""
                 <script>
                     alert(`Gagal Daftar: Email {email_google} sudah terdaftar! Silakan gunakan menu Login.`);
-                    window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html';
+                    window.location.href = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/index.html';
                 </script>
             """)
 
@@ -150,7 +150,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             return HTMLResponse(content="""
                 <script>
                     alert(`Email tidak ditemukan! Silakan daftar akun terlebih dahulu.`);
-                    window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html';
+                    window.location.href = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/index.html';
                 </script>
             """)
 
@@ -161,7 +161,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             return HTMLResponse(content=f"""
                 <script>
                     alert(`Autentikasi Google Berhasil! Silakan lengkapi peran dan jasa logistik Anda.`);
-                    window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/setup-role.html';
+                    window.location.href = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/setup-role.html';
                 </script>
             """)
 
@@ -172,7 +172,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             temp_token = jwt.encode(temp_data, SECRET_KEY, algorithm=ALGORITHM)
             return HTMLResponse(content=f"""
                 <script>
-                    window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html?require_2fa=true&temp_token={temp_token}';
+                    window.location.href = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/index.html?require_2fa=true&temp_token={temp_token}';
                 </script>
             """)
         else:
@@ -183,7 +183,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             
             return HTMLResponse(content=f"""
                 <script>
-                    const targetUrl = 'http://127.0.0.1:5500/frontend-supply-chain/{target_dashboard}?token={access_token}&role={user_db.role}&username=' + encodeURIComponent('{user_db.username}');
+                    const targetUrl = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/{target_dashboard}?token={access_token}&role={user_db.role}&username=' + encodeURIComponent('{user_db.username}');
                     window.location.href = targetUrl;
                 </script>
             """)
@@ -193,7 +193,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
         return HTMLResponse(content=f"""
             <script>
                 alert(`Terjadi Error: {error_msg}`);
-                window.location.href = 'http://127.0.0.1:5500/frontend-supply-chain/index.html';
+                window.location.href = 'https://samjose007.github.io/Projek-UTS-ISA-Secure-Supply-Chain-Tracker/frontend-supply-chain/index.html';
             </script>
         """)
 
