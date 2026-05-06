@@ -200,16 +200,21 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
 class FinalisasiRegister(BaseModel):
     role: str
     jasa_logistik: Optional[str] = None # Opsional untuk Supplier
+    token: str
 
 @router.post("/complete-registration")
-def selesaikan_pendaftaran(data: FinalisasiRegister, request: Request, db: Session = Depends(get_db)):
-    email_baru = request.session.get('temp_email')
-    nama_baru = request.session.get('temp_nama', 'User')
+def selesaikan_pendaftaran(data: FinalisasiRegister, db: Session = Depends(get_db)):
+    # 1. Dekode token dari frontend
+    try:
+        payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "temp_register":
+            raise HTTPException(status_code=400, detail="Token registrasi tidak valid.")
+        
+        email_baru = payload.get("sub")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Sesi pendaftaran habis. Ulangi daftar Google.")
 
-    if not email_baru:
-        raise HTTPException(status_code=400, detail="Sesi pendaftaran habis. Ulangi login Google.")
-
-    # 1. Insert ke Database sekarang
+    # 2. Insert ke Database
     user_baru = Pengguna(
         username=email_baru.split('@')[0],
         email=email_baru,
@@ -219,12 +224,7 @@ def selesaikan_pendaftaran(data: FinalisasiRegister, request: Request, db: Sessi
     )
     db.add(user_baru)
     db.commit()
-    db.refresh(user_baru)
-
-    # 2. Hapus session agar bersih
-    request.session.pop('temp_email', None)
-    request.session.pop('temp_nama', None)
-
+    
     return {"status": "sukses", "pesan": "Akun berhasil dibuat! Silakan login di halaman utama."}
 
 # --- FITUR 2FA ---
