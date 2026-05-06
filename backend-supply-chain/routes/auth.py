@@ -156,8 +156,8 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
 
         # SKENARIO 3: User DAFTAR BARU
         if mode == 'register' and not user_db:
-            request.session['temp_email'] = email_google
-            request.session['temp_nama'] = user_info.get("name")
+            temp_reg_data = {"sub": email_google, "name": user_info.get("name"), "type": "temp_register"}
+            temp_reg_token = jwt.encode(temp_reg_data, SECRET_KEY, algorithm=ALGORITHM)
             return HTMLResponse(content=f"""
                 <script>
                     alert(`Autentikasi Google Berhasil! Silakan lengkapi peran dan jasa logistik Anda.`);
