@@ -14,6 +14,7 @@ from typing import Optional
 import urllib.parse
 from passlib.context import CryptContext
 from pydantic import EmailStr
+from security.audit import record_audit
 
 router = APIRouter(prefix="/auth", tags=["Autentikasi & Keamanan"])
 
@@ -63,13 +64,16 @@ def login_manual(data: LoginManual, db: Session = Depends(get_db)):
     ).first()
 
     if not user or not pwd_context.verify(data.password, user.password_hash):
+        if user:
+            record_audit(db, id_pengguna=user.id_pengguna, tipe_aksi="FAILED_LOGIN", nama_tabel="pengguna", status_baru="Gagal login: Password salah")
         raise HTTPException(status_code=401, detail="ID atau Password Salah!")
 
     if user.totp_secret:
         temp_data = {"sub": str(user.id_pengguna), "type": "temp_2fa"}
         temp_token = jwt.encode(temp_data, SECRET_KEY, algorithm=ALGORITHM)
         return {"require_2fa": True, "temp_token": temp_token}
-
+    
+    record_audit(db, id_pengguna=user.id_pengguna, tipe_aksi="LOGIN", nama_tabel="pengguna", status_baru="Login berhasil (Akses masuk diberikan)")
     token_data = {"role": user.role, "sub": str(user.id_pengguna)}
     access_token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
     
@@ -255,6 +259,7 @@ def verify_setup_2fa(data: VerifySetup, request: Request, db: Session = Depends(
             # 3. JIKA BERHASIL: Simpan secret secara permanen ke database
             user.totp_secret = data.secret
             db.commit()
+            record_audit(db, id_pengguna=user.id_pengguna, tipe_aksi="ENABLE_2FA", nama_tabel="pengguna", status_lama="2FA Tidak Aktif", status_baru="2FA Diaktifkan")
             return {"status": "sukses", "pesan": "Fitur 2FA berhasil diaktifkan kembali!"}
         else:
             raise HTTPException(status_code=400, detail="Kode OTP Salah atau sudah Kadaluwarsa!")
@@ -344,6 +349,7 @@ def disable_2fa(data: Disable2FA, request: Request, db: Session = Depends(get_db
     if totp.verify(data.kode_otp):
         user.totp_secret = None # Hapus kunci 2FA dari database
         db.commit()
+        record_audit(db, id_pengguna=user.id_pengguna, tipe_aksi="DISABLE_2FA", nama_tabel="pengguna", status_lama="2FA Aktif", status_baru="2FA Dinonaktifkan (Risiko Tinggi)")
         return {"status": "sukses", "pesan": "Fitur 2FA berhasil dinonaktifkan."}
     else:
         raise HTTPException(status_code=401, detail="Kode OTP Salah atau Kadaluwarsa!")
