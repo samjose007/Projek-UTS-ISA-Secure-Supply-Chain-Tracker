@@ -82,6 +82,11 @@ def update_status_barang(log_input: LogBaru, db: Session = Depends(get_db)):
 
 @router.get("/verifikasi/{id_pengiriman}")
 def verifikasi_integritas_log(id_pengiriman: int, db: Session = Depends(get_db)):
+    pengiriman = db.query(Pengiriman).filter(Pengiriman.id_pengiriman == id_pengiriman).first()
+    
+    if not pengiriman:
+        raise HTTPException(status_code=404, detail="Data pengiriman tidak ditemukan.")
+
     logs = db.query(LogPelacakan).\
         filter(LogPelacakan.id_pengiriman == id_pengiriman).\
         order_by(LogPelacakan.id_log).all()
@@ -92,8 +97,6 @@ def verifikasi_integritas_log(id_pengiriman: int, db: Session = Depends(get_db))
     for i in range(len(logs)):
         current_log = logs[i]
 
-        # 1. HITUNG ULANG HASH berdasarkan data yang ada di DB sekarang
-        # Kita pakai ID 0 karena saat generate awal kita pakai dummy 0
         recalculated_hash = generate_hash(
             id_log=0, 
             aksi_pelacakan=current_log.aksi_pelacakan,
@@ -101,24 +104,30 @@ def verifikasi_integritas_log(id_pengiriman: int, db: Session = Depends(get_db))
             hash_sebelumnya=current_log.hash_sebelumnya
         )
 
-        # 2. CEK: Apakah isi datanya masih asli?
         if recalculated_hash != current_log.hash_sekarang:
             return {
                 "integritas": "RUSAK!",
-                "pesan": f"PERINGATAN! Data pada Log ID {current_log.id_log} telah diubah secara ilegal. Isi tidak sesuai dengan tanda tangan digitalnya!"
+                "pesan": f"PERINGATAN! Data pada Log ID {current_log.id_log} telah diubah secara ilegal."
             }
 
-        # 3. CEK: Apakah rantainya masih nyambung ke baris sebelumnya? (Kecuali baris pertama)
         if i > 0:
             if current_log.hash_sebelumnya != logs[i-1].hash_sekarang:
                 return {
                     "integritas": "RANTAI PUTUS!",
                     "pesan": f"Log ID {current_log.id_log} mencoba menyambung ke hash yang salah!"
                 }
+                
+    log_terakhir = logs[-1]
+    
+    if (pengiriman.status_pengiriman != log_terakhir.aksi_pelacakan) or (pengiriman.lokasi_sekarang != log_terakhir.lokasi_pelacakan):
+        return {
+            "integritas": "MANIPULASI DATA UTAMA!",
+            "pesan": f"PERINGATAN! Status di Tabel Pengiriman telah dimanipulasi (Bypass) dan tidak sesuai dengan riwayat log terakhir di Blockchain."
+        }
             
     return {
         "integritas": "AMAN",
-        "pesan": "Semua data asli dan urutan rantai valid."
+        "pesan": "Semua data asli, urutan rantai valid, dan tersinkronisasi dengan baik."
     }
 
 @router.get("/all", dependencies=[Depends(role_required(["Admin"]))])
